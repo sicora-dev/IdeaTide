@@ -1,7 +1,8 @@
 import 'server-only';
 
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+import { createClient } from '@supabase/supabase-js';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 import {
   pgTable,
   text,
@@ -14,8 +15,12 @@ import {
 import { count, eq, ilike } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
 
-export const db = drizzle(neon(process.env.POSTGRES_URL!));
+// Configuración de conexión a Supabase
+const connectionString = process.env.POSTGRES_URL!;
+const client = postgres(connectionString);
+export const db = drizzle(client);
 
+// Schema definitions (optional - only if you plan to use products)
 export const statusEnum = pgEnum('status', ['active', 'inactive', 'archived']);
 
 export const products = pgTable('products', {
@@ -39,34 +44,62 @@ export async function getProducts(
   newOffset: number | null;
   totalProducts: number;
 }> {
-  // Always search the full table, not per page
-  if (search) {
-    return {
-      products: await db
+  try {
+    // Always search the full table, not per page
+    if (search) {
+      const searchResults = await db
         .select()
         .from(products)
         .where(ilike(products.name, `%${search}%`))
-        .limit(1000),
+        .limit(1000);
+      
+      return {
+        products: searchResults,
+        newOffset: null,
+        totalProducts: searchResults.length
+      };
+    }
+
+    if (offset === null) {
+      return { products: [], newOffset: null, totalProducts: 0 };
+    }
+
+    const totalProducts = await db.select({ count: count() }).from(products);
+    const moreProducts = await db.select().from(products).limit(5).offset(offset);
+    const newOffset = moreProducts.length >= 5 ? offset + 5 : null;
+
+    return {
+      products: moreProducts,
+      newOffset,
+      totalProducts: totalProducts[0]?.count || 0
+    };
+  } catch (error) {
+    console.warn('Products table not found or error accessing it:', error);
+    // Return empty state when table doesn't exist
+    return {
+      products: [],
       newOffset: null,
       totalProducts: 0
     };
   }
-
-  if (offset === null) {
-    return { products: [], newOffset: null, totalProducts: 0 };
-  }
-
-  let totalProducts = await db.select({ count: count() }).from(products);
-  let moreProducts = await db.select().from(products).limit(5).offset(offset);
-  let newOffset = moreProducts.length >= 5 ? offset + 5 : null;
-
-  return {
-    products: moreProducts,
-    newOffset,
-    totalProducts: totalProducts[0].count
-  };
 }
 
 export async function deleteProductById(id: number) {
-  await db.delete(products).where(eq(products.id, id));
+  try {
+    await db.delete(products).where(eq(products.id, id));
+    return { success: true };
+  } catch (error) {
+    console.warn('Error deleting product:', error);
+    return { success: false, error: 'Product not found or table does not exist' };
+  }
+}
+
+// Function to check if products table exists
+export async function checkProductsTableExists(): Promise<boolean> {
+  try {
+    await db.select().from(products).limit(1);
+    return true;
+  } catch {
+    return false;
+  }
 }

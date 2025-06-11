@@ -1,6 +1,12 @@
-export { auth as middleware } from '@/lib/auth';
+import { type NextRequest } from "next/server";
+import { updateSession } from "libs/supabase/middleware";
 
-// Don't invoke Middleware on some paths
+export async function middleware(request: NextRequest) {
+  return await updateSession(request);
+}
+
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)']
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };
