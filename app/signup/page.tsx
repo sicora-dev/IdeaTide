@@ -64,7 +64,7 @@ export default function SignupPage() {
         router.replace("/signin");
       }
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
       toast.error(error.message || "Error al crear la cuenta.");
     } finally {
       setIsLoading(false);

@@ -58,7 +58,7 @@ export default function LoginPage() {
         router.replace("/");
       }
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
       toast.error(error.message || "Failed to login.");
     } finally {
       setIsLoading(false);

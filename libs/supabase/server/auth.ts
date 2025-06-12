@@ -1,5 +1,6 @@
 import { createClient } from "libs/supabase/server/server";
 import { deleteCookie, getCookie } from "./cookies";
+import { User } from "@/lib/types/users";
 
 export const getSupabaseClient = () => {
   return createClient();
@@ -15,7 +16,7 @@ export const getAuthenticatedUser = async () => {
     return { user: null, supabase };
   }
 
-  return { user: fetchedUser, supabase };
+  return { user: fetchedUser as User, supabase };
 };
 
 export async function getToken(): Promise<string | null> {

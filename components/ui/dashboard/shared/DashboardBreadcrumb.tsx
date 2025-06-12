@@ -9,6 +9,7 @@ import {
   BreadcrumbSeparator
 } from '@/components/ui/dashboard/shared/Breadcrumb';
 import { usePathname } from "next/navigation";
+import { Fragment } from "react";
 
 export default function DashboardBreadcrumb() {
   const pathname = usePathname()
@@ -23,12 +24,12 @@ export default function DashboardBreadcrumb() {
       route: routeName,
     };
   });
-  console.log(routes)
+
   return (
     <Breadcrumb className="hidden md:flex">
       <BreadcrumbList>
-        {routes.map((route) => (
-          <>
+        {routes.map((route, index) => (
+          <Fragment key={route.fullRoute}>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
                 <Link href={route.fullRoute}>
@@ -39,7 +40,7 @@ export default function DashboardBreadcrumb() {
             {route !== routes[routes.length - 1] && (
               <BreadcrumbSeparator />
             )}
-          </>
+          </Fragment>
         ))}
       </BreadcrumbList>
     </Breadcrumb>

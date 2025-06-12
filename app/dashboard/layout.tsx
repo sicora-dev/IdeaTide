@@ -1,15 +1,10 @@
 import Link from 'next/link';
 import {
-  Box,
   Home,
   Lightbulb,
   LineChart,
-  Package,
-  Package2,
   PanelLeft,
-  Settings,
-  ShoppingCart,
-  Users2
+  Settings
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -20,10 +15,9 @@ import {
 } from '@/components/ui/tooltip';
 import { Analytics } from '@vercel/analytics/react';
 import { User } from '@/components/users/User';
-import Providers from './providers';
+import Providers from '../providers';
 import { NavItem } from '../../components/navigation/NavItem';
 import { SearchInput } from '../../components/navigation/SearchInput';
-import Image from 'next/image';
 import { Logo } from '@/components/ui/shared/Logo';
 import DashboardBreadcrumb from '@/components/ui/dashboard/shared/DashboardBreadcrumb';
 import { getAuthenticatedUser } from 'libs/supabase/server/auth';

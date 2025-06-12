@@ -15,7 +15,6 @@ import { LogoutButton } from '../ui/dashboard/user-dropdown/LogoutButton';
 export async function User() {
   try {
     const { user } = await getAuthenticatedUser();
-    console.log('User:', user);
     
     return (
       <DropdownMenu>

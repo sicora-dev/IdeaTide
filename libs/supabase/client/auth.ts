@@ -55,7 +55,7 @@ export async function updateEmailMethod(email: string, redirectTo: string) {
       { emailRedirectTo: redirectTo }
     );
     if (error) throw error;
-    console.log(data);
+    console.error(data);
     return "Please check your email";
   } catch (error: any) {
     console.error("Error updating email:", error);
