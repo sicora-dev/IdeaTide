@@ -13,7 +13,7 @@ import {
   TooltipContent,
   TooltipTrigger
 } from '@/components/ui/tooltip';
-import { Analytics } from '@vercel/analytics/react';
+import { Analytics } from "@vercel/analytics/next"
 import { User } from '@/components/users/User';
 import Providers from '../providers';
 import { NavItem } from '../../components/navigation/NavItem';
