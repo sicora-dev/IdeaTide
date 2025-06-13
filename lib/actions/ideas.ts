@@ -73,7 +73,6 @@ export async function createIdeaAction(formData: FormData) {
     });
 
     revalidatePath('/dashboard/ideas');
-    revalidatePath('/dashboard');
   } catch (error) {
     console.error('Error creating idea:', error);
     throw new Error('Error al crear la idea');

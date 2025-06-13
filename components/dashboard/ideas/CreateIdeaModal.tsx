@@ -27,10 +27,11 @@ import {
   X, 
   Loader2 
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface CreateIdeaModalProps {
   open: boolean;
-  onOpenChangeAction: (open: boolean) => void;
+  onOpenChangeAction: () => void;
   onCreate?: (ideaData: any) => Promise<void>;
   onCancel?: () => void;
   href?: string;
@@ -133,6 +134,7 @@ export default function CreateIdeaModal({
   const [availableSubcategories, setAvailableSubcategories] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -199,7 +201,7 @@ export default function CreateIdeaModal({
     if (onCancel) {
       onCancel();
     }
-    onOpenChangeAction(false);
+    onOpenChangeAction();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -222,12 +224,12 @@ export default function CreateIdeaModal({
         await onCreate(ideaData);
         toast.success('Idea created successfully!');
       } else if (href) {
-        window.location.href = href;
+        router.push(href);
         return;
       }
       
       toast.success('Idea created successfully!');
-      onOpenChangeAction(false);
+      onOpenChangeAction();
       
     } catch (error) {
       toast.error('Error creating idea');

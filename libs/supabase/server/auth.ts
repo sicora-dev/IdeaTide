@@ -16,7 +16,17 @@ export const getAuthenticatedUser = async () => {
     return { user: null, supabase };
   }
 
-  return { user: fetchedUser as User, supabase };
+  if (!fetchedUser.email) {
+    return { user: null, supabase };
+  }
+  const mappedUser: User = {
+    ...fetchedUser,
+    email: fetchedUser.email,
+    created_at: fetchedUser.created_at ? new Date(fetchedUser.created_at) : undefined,
+    updated_at: fetchedUser.updated_at ? new Date(fetchedUser.updated_at) : undefined,
+    last_sign_in_at: fetchedUser.last_sign_in_at ? new Date(fetchedUser.last_sign_in_at) : null,
+  };
+  return { user: mappedUser, supabase };
 };
 
 export async function getToken(): Promise<string | null> {

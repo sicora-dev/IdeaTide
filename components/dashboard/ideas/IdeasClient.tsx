@@ -112,12 +112,16 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
       await createIdeaAction(formData);
       
       // Reload the page to get updated data
-      window.location.reload();
+      router.refresh();
     } catch (error) {
       console.error('Error creating idea:', error);
       throw error; // Re-throw so the modal can handle the error
     }
   };
+
+  const closeCreateModal = () => {
+    setShowCreateModal(false)
+  }
 
   // Badges
   const getStatusBadge = (status: string) => {
@@ -365,9 +369,9 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
       {/* Create Idea Modal */}
       <CreateIdeaModal
         open={showCreateModal}
-        onOpenChangeAction={setShowCreateModal}
+        onOpenChangeAction={closeCreateModal}
         onCreate={handleCreateIdea}
-        onCancel={() => setShowCreateModal(false)}
+        onCancel={closeCreateModal}
       />
     </>
   );
