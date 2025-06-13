@@ -2,19 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getIdeaById, updateIdea, deleteIdea } from '@/lib/db/queries';
 import { updateIdeaSchema } from '@/lib/schemas/ideas';
 import { createClient } from 'libs/supabase/server/server';
-
-async function getAuthenticatedUser() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  return user;
-}
+import { getAuthenticatedUser } from '@/libs/supabase/server/auth';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await getAuthenticatedUser();
+    const { user } = await getAuthenticatedUser();
     if (!user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
@@ -38,7 +33,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await getAuthenticatedUser();
+    const { user } = await getAuthenticatedUser();
     if (!user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
@@ -77,7 +72,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await getAuthenticatedUser();
+    const { user } = await getAuthenticatedUser();
     if (!user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
