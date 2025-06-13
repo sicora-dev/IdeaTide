@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getIdeas, createIdea } from '@/lib/db/queries';
-import { createIdeaSchema } from '@/lib/validations/ideas';
-import { statusToDatabase, priorityToDatabase, effortToDatabase, impactToDatabase } from '@/lib/utils/translations';
+import { createIdeaSchema } from '@/lib/schemas/ideas';
 import { createClient } from 'libs/supabase/server/server';
 
 async function getAuthenticatedUser() {
@@ -41,9 +40,9 @@ export async function POST(request: NextRequest) {
     const idea = await createIdea({
       ...validatedData,
       status: 'new',
-      priority: (priorityToDatabase(validatedData.priority) as "low" | "medium" | "high"),
-      estimated_effort: effortToDatabase(validatedData.estimated_effort) as "low" | "medium" | "high",
-      potential_impact: impactToDatabase(validatedData.potential_impact) as "low" | "medium" | "high",
+      priority: (validatedData.priority as "low" | "medium" | "high"),
+      estimated_effort: validatedData.estimated_effort as "low" | "medium" | "high",
+      potential_impact: validatedData.potential_impact as "low" | "medium" | "high",
       is_favorite: false,
       user_id: user.id,
     });

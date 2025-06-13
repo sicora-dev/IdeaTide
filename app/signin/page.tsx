@@ -78,10 +78,10 @@ export default function LoginPage() {
         <Card className="border-0 shadow-2xl bg-white/80 backdrop-blur-sm">
           <CardHeader className="text-center pb-6">
             <CardTitle className="text-3xl font-bold text-slate-900">
-              Iniciar sesión
+              Sign In
             </CardTitle>
             <CardDescription className="text-slate-600 text-base">
-              Accede a tu cuenta para continuar
+              Log in to your account to continue
             </CardDescription>
           </CardHeader>
           
@@ -90,12 +90,12 @@ export default function LoginPage() {
             <form onSubmit={(e) => handleLogin(e, { type: "password" })} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-slate-700 font-medium">
-                  Correo electrónico
+                  Email address
                 </Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="tu@email.com"
+                  placeholder="your@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -105,7 +105,7 @@ export default function LoginPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-slate-700 font-medium">
-                  Contraseña
+                  Password
                 </Label>
                 <Input
                   id="password"
@@ -123,7 +123,7 @@ export default function LoginPage() {
                 className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold text-base" 
                 disabled={isLoading}
               >
-                {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
+                {isLoading ? "Signin In..." : "Sign In"}
               </Button>
             </form>
 
@@ -133,7 +133,7 @@ export default function LoginPage() {
               </div>
               <div className="relative flex justify-center text-sm uppercase">
                 <span className="bg-white px-4 text-slate-500 font-medium">
-                  O continúa con
+                  Or continue with
                 </span>
               </div>
             </div>
@@ -151,15 +151,15 @@ export default function LoginPage() {
                 <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                 <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
-              {isLoading ? "Cargando..." : "Continuar con Google"}
+              {isLoading ? "Loading..." : "Continue with Google"}
             </Button>
           </CardContent>
           
           <CardFooter className="pt-4">
             <p className="text-center w-full text-slate-600">
-              ¿No tienes una cuenta?{' '}
+              Don't have an account?{' '}
               <Link href="/signup" className="text-blue-600 hover:text-blue-700 font-semibold hover:underline">
-                Registrarse
+                Sign Up
               </Link>
             </p>
           </CardFooter>
@@ -168,7 +168,7 @@ export default function LoginPage() {
         {/* Footer link */}
         <div className="text-center">
           <Link href="/" className="text-slate-500 hover:text-slate-700 text-sm">
-            ← Volver al inicio
+            Go back to Home
           </Link>
         </div>
       </div>

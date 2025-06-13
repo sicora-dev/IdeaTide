@@ -60,7 +60,7 @@ export default function SignupPage() {
           },
         });
         if (error) throw error;
-        toast.success("¡Revisa tu email para confirmar tu cuenta!");
+        toast.success("Check your email to confirm your account!");
         router.replace("/signin");
       }
     } catch (error: any) {
@@ -84,10 +84,10 @@ export default function SignupPage() {
         <Card className="border-0 shadow-2xl bg-white/80 backdrop-blur-sm">
           <CardHeader className="text-center pb-6">
             <CardTitle className="text-3xl font-bold text-slate-900">
-              Crear cuenta
+              Create an Account
             </CardTitle>
             <CardDescription className="text-slate-600 text-base">
-              Únete a IdeaTide y comienza a organizar tus ideas
+              Join IdeaTide and start organizing your ideas today!
             </CardDescription>
           </CardHeader>
           
@@ -96,12 +96,12 @@ export default function SignupPage() {
             <form onSubmit={(e) => handleSignup(e, { type: "password" })} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="fullName" className="text-slate-700 font-medium">
-                  Nombre completo
+                  Full Name
                 </Label>
                 <Input
                   id="fullName"
                   type="text"
-                  placeholder="Tu nombre completo"
+                  placeholder="John Doe"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
@@ -111,12 +111,12 @@ export default function SignupPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-slate-700 font-medium">
-                  Correo electrónico
+                  Email Address
                 </Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="tu@email.com"
+                  placeholder="your@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -126,12 +126,12 @@ export default function SignupPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-slate-700 font-medium">
-                  Contraseña
+                  Password
                 </Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder="6 characters minimum"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -145,7 +145,7 @@ export default function SignupPage() {
                 className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold text-base" 
                 disabled={isLoading}
               >
-                {isLoading ? "Creando cuenta..." : "Crear cuenta"}
+                {isLoading ? "Creating account..." : "Create Account"}
               </Button>
             </form>
 
@@ -155,7 +155,7 @@ export default function SignupPage() {
               </div>
               <div className="relative flex justify-center text-sm uppercase">
                 <span className="bg-white px-4 text-slate-500 font-medium">
-                  O continúa con
+                  Or continue with
                 </span>
               </div>
             </div>
@@ -173,15 +173,15 @@ export default function SignupPage() {
                 <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                 <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
-              {isLoading ? "Cargando..." : "Continuar con Google"}
+              {isLoading ? "Loading..." : "Continue with Google"}
             </Button>
           </CardContent>
           
           <CardFooter className="pt-4">
             <p className="text-center w-full text-slate-600">
-              ¿Ya tienes una cuenta?{' '}
+              Already have an account?{' '}
               <Link href="/signin" className="text-blue-600 hover:text-blue-700 font-semibold hover:underline">
-                Iniciar sesión
+                Sign In
               </Link>
             </p>
           </CardFooter>
@@ -190,7 +190,7 @@ export default function SignupPage() {
         {/* Footer link */}
         <div className="text-center">
           <Link href="/" className="text-slate-500 hover:text-slate-700 text-sm">
-            ← Volver al inicio
+            Go back to Home
           </Link>
         </div>
       </div>

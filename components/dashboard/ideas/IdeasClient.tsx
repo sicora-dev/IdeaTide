@@ -36,6 +36,7 @@ import {
 import { toggleFavoriteAction, deleteIdeaAction, createIdeaAction } from '@/lib/actions/ideas';
 import { SelectIdea } from '@/lib/db/schema';
 import CreateIdeaModal from './CreateIdeaModal';
+import { useRouter } from 'next/navigation';
 
 interface IdeasClientProps {
   initialIdeas: SelectIdea[];
@@ -46,6 +47,7 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const router = useRouter();
 
   const filteredIdeas = ideas.filter(idea => {
     const matchesSearch = 
@@ -61,6 +63,10 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
     return matchesSearch && matchesFilter;
   });
 
+  const gotoIdea = (id: number) => {
+    router.push(`/dashboard/ideas/${id}`);
+  }
+
   const handleToggleFavorite = async (id: number, currentFavorite: boolean) => {
     try {
       await toggleFavoriteAction(id, currentFavorite);
@@ -69,28 +75,28 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
           idea.id === id ? { ...idea, is_favorite: !currentFavorite } : idea
         )
       );
-      toast.success(currentFavorite ? 'Removido de favoritos' : 'Añadido a favoritos');
+      toast.success(currentFavorite ? 'Removed from favorites' : 'Added to favorites');
     } catch (error) {
-      toast.error('Error al actualizar favorito');
+      toast.error('Error updating favorite');
     }
   };
 
-  // Manejar eliminación
+  // Handle delete
   const handleDelete = async (id: number) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar esta idea?')) {
+    if (!confirm('Are you sure you want to delete this idea?')) {
       return;
     }
 
     try {
       await deleteIdeaAction(id);
       setIdeas(prev => prev.filter(idea => idea.id !== id));
-      toast.success('Idea eliminada correctamente');
+      toast.success('Idea deleted successfully');
     } catch (error) {
-      toast.error('Error al eliminar la idea');
+      toast.error('Error deleting idea');
     }
   };
 
-  // Manejar creación de idea
+  // Handle create idea
   const handleCreateIdea = async (ideaData: any) => {
     try {
       const formData = new FormData();
@@ -105,11 +111,11 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
 
       await createIdeaAction(formData);
       
-      // Recargar la página para obtener los datos actualizados
+      // Reload the page to get updated data
       window.location.reload();
     } catch (error) {
-      console.error('Error al crear la idea:', error);
-      throw error; // Re-throw para que el modal maneje el error
+      console.error('Error creating idea:', error);
+      throw error; // Re-throw so the modal can handle the error
     }
   };
 
@@ -122,9 +128,17 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
       'completada': 'outline'
     } as const;
     
+    // Translate status to English
+    const statusTranslations: Record<string, string> = {
+      'nueva': 'New',
+      'en_progreso': 'In Progress',
+      'en_revision': 'In Review',
+      'completada': 'Completed'
+    };
+
     return (
       <Badge variant={variants[status as keyof typeof variants] || 'default'}>
-        {status.replace('_', ' ')}
+        {statusTranslations[status] || status.replace('_', ' ')}
       </Badge>
     );
   };
@@ -135,10 +149,17 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
       'media': 'secondary',
       'baja': 'outline'
     } as const;
+
+    // Translate priority to English
+    const priorityTranslations: Record<string, string> = {
+      'alta': 'High',
+      'media': 'Medium',
+      'baja': 'Low'
+    };
     
     return (
       <Badge variant={variants[priority as keyof typeof variants] || 'outline'}>
-        {priority}
+        {priorityTranslations[priority] || priority}
       </Badge>
     );
   };
@@ -154,20 +175,20 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
               My Ideas
             </h1>
             <p className="text-muted-foreground">
-              Gestiona, organiza y desarrolla todas tus ideas creativas ({ideas.length} ideas)
+              Manage, organize, and develop all your creative ideas ({ideas.length} ideas)
             </p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm">
               <Brain className="h-4 w-4 mr-2" />
-              Auto-organizar IA
+              AI Auto-organize
             </Button>
             <Button 
               size="sm" 
               onClick={() => setShowCreateModal(true)}
             >
               <Plus className="h-4 w-4 mr-2" />
-              Nueva Idea
+              New Idea
             </Button>
           </div>
         </div>
@@ -180,7 +201,7 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
                 <div className="relative">
                   <Search className="absolute left-2 top-3 h-4 w-4 text-muted-foreground" />
                   <Input 
-                    placeholder="Buscar ideas..." 
+                    placeholder="Search ideas..." 
                     className="pl-8"
                     value={searchTerm}
                     onChange={(e: any) => setSearchTerm(e.target.value)}
@@ -191,27 +212,27 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm">
                     <Filter className="h-4 w-4 mr-2" />
-                    Filtros
+                    Filters
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
+                  <DropdownMenuLabel>Filter by</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setFilterStatus('all')}>
-                    Todas las ideas
+                    All ideas
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setFilterStatus('favorites')}>
-                    Favoritas
+                    Favorites
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setFilterStatus('en_progreso')}>
-                    En progreso
+                    In Progress
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setFilterStatus('nueva')}>
-                    Nuevas
+                    New
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setFilterStatus('completada')}>
-                    Completadas
+                    Completed
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -224,13 +245,13 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
           <Card>
             <CardContent className="pt-6 text-center">
               <Lightbulb className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No hay ideas todavía</h3>
+              <h3 className="text-lg font-semibold mb-2">No ideas yet</h3>
               <p className="text-muted-foreground mb-4">
-                {searchTerm ? 'No se encontraron ideas con esos criterios' : 'Comienza creando tu primera idea'}
+                {searchTerm ? 'No ideas found with those criteria' : 'Start by creating your first idea'}
               </p>
               <Button onClick={() => setShowCreateModal(true)}>
                 <Plus className="h-4 w-4 mr-2" />
-                Nueva Idea
+                New Idea
               </Button>
             </CardContent>
           </Card>
@@ -270,11 +291,11 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
                       <DropdownMenuContent>
                         <DropdownMenuItem>
                           <Eye className="h-4 w-4 mr-2" />
-                          Ver detalles
+                          View details
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => gotoIdea(idea.id)}>
                           <Edit className="h-4 w-4 mr-2" />
-                          Editar
+                          Edit
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem 
@@ -282,7 +303,7 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
                           onClick={() => handleDelete(idea.id)}
                         >
                           <Trash className="h-4 w-4 mr-2" />
-                          Eliminar
+                          Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -303,15 +324,15 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
 
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <span className="text-muted-foreground">Estado:</span>
+                      <span className="text-muted-foreground">Status:</span>
                       <div className="mt-1">{getStatusBadge(idea.status)}</div>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Prioridad:</span>
+                      <span className="text-muted-foreground">Priority:</span>
                       <div className="mt-1">{getPriorityBadge(idea.priority)}</div>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Esfuerzo:</span>
+                      <span className="text-muted-foreground">Effort:</span>
                       <div className="mt-1">
                         <Badge variant="outline" className="text-xs">
                           {idea.estimated_effort}
@@ -319,7 +340,7 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
                       </div>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Impacto:</span>
+                      <span className="text-muted-foreground">Impact:</span>
                       <div className="mt-1">
                         <Badge variant="outline" className="text-xs">
                           {idea.potential_impact}
@@ -331,7 +352,7 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
                   <div className="pt-2 border-t text-xs text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <Clock className="h-3 w-3" />
-                      Actualizada: {new Date(idea.updated_at).toLocaleDateString('es-ES')}
+                      Updated: {new Date(idea.updated_at).toLocaleDateString('es-ES')}
                     </div>
                   </div>
                 </CardContent>
@@ -341,7 +362,7 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
         )}
       </div>
 
-      {/* Modal de Crear Idea */}
+      {/* Create Idea Modal */}
       <CreateIdeaModal
         open={showCreateModal}
         onOpenChangeAction={setShowCreateModal}

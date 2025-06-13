@@ -1,9 +1,9 @@
-import { getAuthenticatedUser, getSupabaseClient } from "libs/supabase/server/auth";
+import { getAuthenticatedUser } from "libs/supabase/server/auth";
 
 export async function getProfileData() {
   const { user, supabase } = await getAuthenticatedUser();
 
-  const { data, error } = await (await supabase)
+  const { data, error } = await supabase
     .from("users")
     .select("*")
     .eq("id", user?.id)

@@ -45,12 +45,12 @@ interface CategoryOption {
 const categories: CategoryOption[] = [
   { 
     value: 'technology', 
-    label: 'Tecnología', 
+    label: 'Technology', 
     subcategories: ['mobile_app', 'web_app', 'ai', 'iot', 'blockchain'] 
   },
   { 
     value: 'sustainability', 
-    label: 'Sostenibilidad', 
+    label: 'Sustainability', 
     subcategories: ['green_tech', 'renewable_energy', 'recycling', 'sustainable_agriculture'] 
   },
   { 
@@ -60,61 +60,61 @@ const categories: CategoryOption[] = [
   },
   { 
     value: 'health', 
-    label: 'Salud', 
+    label: 'Health', 
     subcategories: ['medical_app', 'wellness', 'fitness', 'nutrition'] 
   },
   { 
     value: 'finance', 
-    label: 'Finanzas', 
+    label: 'Finance', 
     subcategories: ['fintech', 'investment', 'savings', 'cryptocurrency'] 
   },
   { 
     value: 'entertainment', 
-    label: 'Entretenimiento', 
+    label: 'Entertainment', 
     subcategories: ['games', 'music', 'video', 'art'] 
   },
   { 
     value: 'education', 
-    label: 'Educación', 
+    label: 'Education', 
     subcategories: ['elearning', 'educational_tools', 'languages', 'skills'] 
   },
   { 
     value: 'business', 
-    label: 'Negocios', 
+    label: 'Business', 
     subcategories: ['startup', 'b2b', 'b2c', 'marketplace'] 
   }
 ];
 
 const subcategoryLabels: Record<string, string> = {
-  'mobile_app': 'Aplicación Móvil',
-  'web_app': 'Aplicación Web',
-  'ai': 'Inteligencia Artificial',
+  'mobile_app': 'Mobile App',
+  'web_app': 'Web App',
+  'ai': 'Artificial Intelligence',
   'iot': 'IoT',
   'blockchain': 'Blockchain',
-  'green_tech': 'Tecnología Verde',
-  'renewable_energy': 'Energía Renovable',
-  'recycling': 'Reciclaje',
-  'sustainable_agriculture': 'Agricultura Sostenible',
-  'web_platform': 'Plataforma Web',
-  'social_network': 'Red Social',
-  'community': 'Comunidad',
-  'social_education': 'Educación Social',
-  'medical_app': 'Aplicación Médica',
-  'wellness': 'Bienestar',
+  'green_tech': 'Green Tech',
+  'renewable_energy': 'Renewable Energy',
+  'recycling': 'Recycling',
+  'sustainable_agriculture': 'Sustainable Agriculture',
+  'web_platform': 'Web Platform',
+  'social_network': 'Social Network',
+  'community': 'Community',
+  'social_education': 'Social Education',
+  'medical_app': 'Medical App',
+  'wellness': 'Wellness',
   'fitness': 'Fitness',
-  'nutrition': 'Nutrición',
+  'nutrition': 'Nutrition',
   'fintech': 'Fintech',
-  'investment': 'Inversión',
-  'savings': 'Ahorro',
-  'cryptocurrency': 'Criptomonedas',
-  'games': 'Juegos',
-  'music': 'Música',
+  'investment': 'Investment',
+  'savings': 'Savings',
+  'cryptocurrency': 'Cryptocurrency',
+  'games': 'Games',
+  'music': 'Music',
   'video': 'Video',
-  'art': 'Arte',
+  'art': 'Art',
   'elearning': 'E-learning',
-  'educational_tools': 'Herramientas Educativas',
-  'languages': 'Idiomas',
-  'skills': 'Habilidades',
+  'educational_tools': 'Educational Tools',
+  'languages': 'Languages',
+  'skills': 'Skills',
   'startup': 'Startup',
   'b2b': 'B2B',
   'b2c': 'B2C',
@@ -139,9 +139,9 @@ export default function CreateIdeaModal({
     description: '',
     category: '',
     subcategory: '',
-    priority: 'media',
-    estimated_effort: 'Media',
-    potential_impact: 'Medio',
+    priority: 'medium',
+    estimated_effort: 'medium',
+    potential_impact: 'medium',
   });
 
   useEffect(() => {
@@ -156,9 +156,9 @@ export default function CreateIdeaModal({
       description: '',
       category: '',
       subcategory: '',
-      priority: 'media',
-      estimated_effort: 'Media',
-      potential_impact: 'Medio',
+      priority: 'medium',
+      estimated_effort: 'medium',
+      potential_impact: 'medium',
     });
     setTags([]);
     setTagInput('');
@@ -206,7 +206,7 @@ export default function CreateIdeaModal({
     e.preventDefault();
     
     if (!formData.title.trim() || !formData.description.trim() || !formData.category || !formData.subcategory) {
-      toast.error('Por favor completa todos los campos obligatorios');
+      toast.error('Please complete all required fields');
       return;
     }
 
@@ -219,19 +219,18 @@ export default function CreateIdeaModal({
       };
 
       if (onCreate) {
-        console.log('Creating idea with data:', ideaData);
         await onCreate(ideaData);
-        toast.success('¡Idea creada exitosamente!');
+        toast.success('Idea created successfully!');
       } else if (href) {
         window.location.href = href;
         return;
       }
       
-      toast.success('¡Idea creada exitosamente!');
+      toast.success('Idea created successfully!');
       onOpenChangeAction(false);
       
     } catch (error) {
-      toast.error('Error al crear la idea');
+      toast.error('Error creating idea');
       console.error('Error creating idea:', error);
     } finally {
       setLoading(false);
@@ -244,28 +243,28 @@ export default function CreateIdeaModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Lightbulb className="h-5 w-5" />
-            Nueva Idea
+            New Idea
           </DialogTitle>
           <DialogDescription>
-            Captura y organiza tu próxima gran idea
+            Capture and organize your next big idea
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Información Básica */}
+          {/* Basic Information */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 pb-2 border-b">
               <Sparkles className="h-4 w-4" />
-              <h3 className="font-semibold">Información Básica</h3>
+              <h3 className="font-semibold">Basic Information</h3>
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="title">
-                Título <span className="text-red-500">*</span>
+                Title <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="title"
-                placeholder="Ej: App de Meditación Gamificada"
+                placeholder="E.g. Gamified Meditation App"
                 value={formData.title}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                 required
@@ -274,11 +273,11 @@ export default function CreateIdeaModal({
 
             <div className="space-y-2">
               <Label htmlFor="description">
-                Descripción <span className="text-red-500">*</span>
+                Description <span className="text-red-500">*</span>
               </Label>
               <Textarea
                 id="description"
-                placeholder="Describe tu idea con el mayor detalle posible..."
+                placeholder="Describe your idea in as much detail as possible..."
                 rows={4}
                 value={formData.description}
                 onChange={(e: any) => setFormData(prev => ({ ...prev, description: e.target.value }))}
@@ -289,7 +288,7 @@ export default function CreateIdeaModal({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="category">
-                  Categoría <span className="text-red-500">*</span>
+                  Category <span className="text-red-500">*</span>
                 </Label>
                 <Select
                   value={formData.category}
@@ -297,7 +296,7 @@ export default function CreateIdeaModal({
                   required
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecciona una categoría" />
+                    <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((category) => (
@@ -311,7 +310,7 @@ export default function CreateIdeaModal({
 
               <div className="space-y-2">
                 <Label htmlFor="subcategory">
-                  Subcategoría <span className="text-red-500">*</span>
+                  Subcategory <span className="text-red-500">*</span>
                 </Label>
                 <Select
                   value={formData.subcategory}
@@ -320,7 +319,7 @@ export default function CreateIdeaModal({
                   disabled={!selectedCategory}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecciona subcategoría" />
+                    <SelectValue placeholder="Select a subcategory" />
                   </SelectTrigger>
                   <SelectContent>
                     {availableSubcategories.map((subcategory) => (
@@ -339,13 +338,13 @@ export default function CreateIdeaModal({
                 <div className="flex gap-2">
                   <Input
                     id="tags"
-                    placeholder="Escribe un tag y presiona Enter"
+                    placeholder="Type a tag and press Enter"
                     value={tagInput}
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={handleTagInputKeyDown}
                   />
                   <Button type="button" variant="outline" onClick={addTag}>
-                    Añadir
+                    Add
                   </Button>
                 </div>
                 {tags.length > 0 && (
@@ -368,16 +367,16 @@ export default function CreateIdeaModal({
             </div>
           </div>
 
-          {/* Evaluación del Proyecto */}
+          {/* Project Evaluation */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 pb-2 border-b">
               <Sparkles className="h-4 w-4" />
-              <h3 className="font-semibold">Evaluación del Proyecto</h3>
+              <h3 className="font-semibold">Project Evaluation</h3>
             </div>
 
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="priority">Prioridad</Label>
+                <Label htmlFor="priority">Priority</Label>
                 <Select
                   value={formData.priority}
                   onValueChange={(value: string) => setFormData(prev => ({ ...prev, priority: value }))}
@@ -386,15 +385,15 @@ export default function CreateIdeaModal({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="baja">Baja</SelectItem>
-                    <SelectItem value="media">Media</SelectItem>
-                    <SelectItem value="alta">Alta</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="estimatedEffort">Esfuerzo Estimado</Label>
+                <Label htmlFor="estimatedEffort">Estimated Effort</Label>
                 <Select
                   value={formData.estimated_effort}
                   onValueChange={(value: string) => setFormData(prev => ({ ...prev, estimated_effort: value }))}
@@ -403,15 +402,15 @@ export default function CreateIdeaModal({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Baja">Baja</SelectItem>
-                    <SelectItem value="Media">Media</SelectItem>
-                    <SelectItem value="Alta">Alta</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="potentialImpact">Impacto Potencial</Label>
+                <Label htmlFor="potentialImpact">Potential Impact</Label>
                 <Select
                   value={formData.potential_impact}
                   onValueChange={(value: string) => setFormData(prev => ({ ...prev, potential_impact: value }))}
@@ -420,27 +419,27 @@ export default function CreateIdeaModal({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Bajo">Bajo</SelectItem>
-                    <SelectItem value="Medio">Medio</SelectItem>
-                    <SelectItem value="Alto">Alto</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
           </div>
 
-          {/* Botones */}
+          {/* Buttons */}
           <div className="flex gap-4 pt-4">
             <Button type="submit" className="flex-1" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Creando...
+                  Creating...
                 </>
               ) : (
                 <>
                   <Lightbulb className="h-4 w-4 mr-2" />
-                  Crear Idea
+                  Create Idea
                 </>
               )}
             </Button>
@@ -450,7 +449,7 @@ export default function CreateIdeaModal({
               onClick={handleCancel}
               disabled={loading}
             >
-              Cancelar
+              Cancel
             </Button>
           </div>
         </form>

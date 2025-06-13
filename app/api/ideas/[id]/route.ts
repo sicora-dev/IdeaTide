@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getIdeaById, updateIdea, deleteIdea } from '@/lib/db/queries';
-import { updateIdeaSchema } from '@/lib/validations/ideas';
-import { statusToDatabase, priorityToDatabase, effortToDatabase, impactToDatabase } from '@/lib/utils/translations';
+import { updateIdeaSchema } from '@/lib/schemas/ideas';
 import { createClient } from 'libs/supabase/server/server';
 
 async function getAuthenticatedUser() {
@@ -51,13 +50,13 @@ export async function PUT(
     // Convertir campos a inglés para BD
     const dataToUpdate: any = { ...validatedData };
     if (validatedData.priority) {
-      dataToUpdate.priority = priorityToDatabase(validatedData.priority);
+      dataToUpdate.priority = validatedData.priority;
     }
     if (validatedData.estimated_effort) {
-      dataToUpdate.estimatedEffort = effortToDatabase(validatedData.estimated_effort);
+      dataToUpdate.estimatedEffort = validatedData.estimated_effort;
     }
     if (validatedData.potential_impact) {
-      dataToUpdate.potentialImpact = impactToDatabase(validatedData.potential_impact);
+      dataToUpdate.potentialImpact = validatedData.potential_impact;
     }
     
     const idea = await updateIdea(id, user.id, dataToUpdate);

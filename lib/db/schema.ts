@@ -42,10 +42,10 @@ export const ideas = pgTable('ideas', {
 export const categories = pgTable('categories', {
   id: bigserial('id', { mode: 'number' }).primaryKey(),
   name: varchar('name', { length: 100 }).notNull().unique(),
-  nameEs: varchar('name_es', { length: 100 }).notNull(),
+  name_es: varchar('name_es', { length: 100 }).notNull(),
   description: text('description'),
   color: varchar('color', { length: 7 }).default('#6B7280'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 // Tabla de subcategorías
@@ -53,9 +53,9 @@ export const subcategories = pgTable('subcategories', {
   id: bigserial('id', { mode: 'number' }).primaryKey(),
   categoryId: bigserial('category_id', { mode: 'number' }).notNull(),
   name: varchar('name', { length: 100 }).notNull(),
-  nameEs: varchar('name_es', { length: 100 }).notNull(),
+  name_es: varchar('name_es', { length: 100 }).notNull(),
   description: text('description'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 // Tipos TypeScript
@@ -63,29 +63,3 @@ export type SelectIdea = typeof ideas.$inferSelect;
 export type InsertIdea = typeof ideas.$inferInsert;
 export type SelectCategory = typeof categories.$inferSelect;
 export type SelectSubcategory = typeof subcategories.$inferSelect;
-
-// Mapeos para traducción (inglés de BD -> español de UI)
-export const statusTranslations = {
-  'new': 'nueva',
-  'in_progress': 'en_progreso', 
-  'under_review': 'en_revision',
-  'completed': 'completada'
-} as const;
-
-export const priorityTranslations = {
-  'low': 'baja',
-  'medium': 'media',
-  'high': 'alta'
-} as const;
-
-export const effortTranslations = {
-  'low': 'Baja',
-  'medium': 'Media', 
-  'high': 'Alta'
-} as const;
-
-export const impactTranslations = {
-  'low': 'Bajo',
-  'medium': 'Medio',
-  'high': 'Alto'
-} as const;
