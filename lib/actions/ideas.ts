@@ -77,8 +77,6 @@ export async function createIdeaAction(formData: FormData) {
     console.error('Error creating idea:', error);
     throw new Error('Error al crear la idea');
   }
-  
-  redirect('/dashboard/ideas');
 }
 
 // Actualizar idea
@@ -171,10 +169,9 @@ export async function updateIdeaStatusAction(id: number, status: IdeaStatus) {
 }
 
 // Obtener estadísticas del dashboard
-export async function getDashboardStats() {
+export async function getDashboardStats(userId: string) {
   try {
-    const { user } = await getAuthenticatedUser();
-    const allIdeas = await getAllIdeasForStats(user.id);
+    const allIdeas = await getAllIdeasForStats(userId);
 
     // Procesar estadísticas
     const totalIdeas = allIdeas.length;

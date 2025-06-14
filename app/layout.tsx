@@ -1,6 +1,8 @@
 import './globals.css';
 
 import { Analytics } from "@vercel/analytics/next"
+import { Toaster } from "react-hot-toast";
+import Providers from './providers';
 
 export const metadata = {
   title: 'IdeaTide - Gestor de Ideas Inteligente',
@@ -15,8 +17,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className="flex min-h-screen w-full flex-col">{children}</body>
-      <Analytics />
+      <body className="flex min-h-screen w-full flex-col">
+        <Providers>
+          {children}
+        </Providers>
+        <Analytics />
+      </body>
     </html>
   );
 }

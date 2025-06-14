@@ -33,6 +33,9 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
+
+    --rainbow: linear-gradient(to right, #2563eb, #9333ea);
+    --rainbow-hover: linear-gradient(to right, #1d4ed8, #7c3aed);
   }
 
   .dark {

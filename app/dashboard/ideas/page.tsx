@@ -4,6 +4,8 @@ import { Loader2 } from 'lucide-react';
 import IdeasClient from '@/components/dashboard/ideas/IdeasClient';
 import { getAuthenticatedUser } from 'libs/supabase/server/auth';
 
+export const dynamic = 'force-dynamic'
+
 function IdeasLoading() {
   return (
     <div className="flex items-center justify-center h-64">

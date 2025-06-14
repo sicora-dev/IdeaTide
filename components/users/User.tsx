@@ -34,10 +34,18 @@ export async function User() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel>{user.full_name || "My Account"}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Settings</DropdownMenuItem>
-          <DropdownMenuItem>Support</DropdownMenuItem>
+          <DropdownMenuItem>
+            <Link href="/dashboard/profile">
+              Settings
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Link href="/support">
+              Support
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem>
             <LogoutButton />

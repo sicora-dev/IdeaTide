@@ -3,7 +3,7 @@
 import { createClient } from 'libs/supabase/client/client';
 import { deleteCookie } from 'libs/supabase/server/cookies';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+import { toast } from 'react-hot-toast';
 
 export function LogoutButton() {
   const router = useRouter();

@@ -18,6 +18,7 @@ import { CartesianGrid, Line, LineChart, XAxis } from 'recharts';
 import { Brain, TrendingUp, TrendingDown, Zap, Lightbulb, PlayCircle, CheckCircle } from 'lucide-react';
 import { SelectIdea } from '@/lib/db/schema';
 import { useRouter } from 'next/navigation';
+import {  useEffect, useMemo, useState } from 'react';
 
 interface DashboardData {
   totalIdeas: number;
@@ -37,65 +38,120 @@ interface StatsClientProps {
 
 export default function StatsClient({ dashboardData }: StatsClientProps) {
   const { totalIdeas, inProgress, completed, recentIdeas, monthlyCharts } = dashboardData;
-  const router = useRouter()
-  const calculatePercentage = (current: number, total: number) => {
-    if (total === 0) return 0;
-    return Math.round((current / total) * 100);
+  const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const calculateMonthlyChange = (chartData: Array<{ month: string; value: number }>) => {
+    if (chartData.length < 2) return { percentage: 0, isPositive: true };
+    
+    const currentMonth = chartData[chartData.length - 1].value;
+    const previousMonth = chartData[chartData.length - 2].value;
+    
+    if (previousMonth === 0) {
+      return { 
+        percentage: currentMonth > 0 ? 100 : 0, 
+        isPositive: currentMonth >= 0 
+      };
+    }
+    
+    const change = ((currentMonth - previousMonth) / previousMonth) * 100;
+    return { 
+      percentage: Math.round(Math.abs(change)), 
+      isPositive: change >= 0 
+    };
   };
 
-  const completionRate = calculatePercentage(completed, totalIdeas);
-  const progressRate = calculatePercentage(inProgress, totalIdeas);
+  const statsData = useMemo(() => {
+    const createdChange = calculateMonthlyChange(monthlyCharts.createdByMonth);
+    const inProgressChange = calculateMonthlyChange(monthlyCharts.inProgressByMonth);
+    const completedChange = calculateMonthlyChange(monthlyCharts.completedByMonth);
 
-  const statsData = [
-    {
-      title: "Total Ideas",
-      value: totalIdeas,
-      description: "Total registered ideas",
-      icon: Lightbulb,
-      trend: totalIdeas > 0 ? `${totalIdeas} ideas` : "No ideas yet",
-      isPositive: true,
-      chartData: monthlyCharts.createdByMonth,
-      chartConfig: {
-        value: {
-          label: "Ideas Created"
+    return [
+      {
+        title: "Total Ideas",
+        value: totalIdeas,
+        description: "Total registered ideas",
+        icon: Lightbulb,
+        trend: createdChange.percentage > 0 
+          ? `${createdChange.isPositive ? '+' : '-'}${createdChange.percentage}% from last month`
+          : "No change from last month",
+        isPositive: createdChange.isPositive,
+        chartData: monthlyCharts.createdByMonth,
+        chartConfig: {
+          value: {
+            label: "Ideas Created"
+          },
         },
+        showChart: true
       },
-      showChart: true
-    },
-    {
-      title: "In Progress", 
-      value: inProgress,
-      description: "Ideas currently in development",
-      icon: PlayCircle,
-      trend: `${progressRate}% of total`,
-      isPositive: inProgress > 0,
-      chartData: monthlyCharts.inProgressByMonth,
-      chartConfig: {
-        value: {
-          label: "In Progress"
+      {
+        title: "In Progress", 
+        value: inProgress,
+        description: "Ideas currently in development",
+        icon: PlayCircle,
+        trend: inProgressChange.percentage > 0 
+          ? `${inProgressChange.isPositive ? '+' : '-'}${inProgressChange.percentage}% from last month`
+          : "No change from last month",
+        isPositive: inProgressChange.isPositive,
+        chartData: monthlyCharts.inProgressByMonth,
+        chartConfig: {
+          value: {
+            label: "In Progress"
+          },
         },
+        showChart: true
       },
-      showChart: true
-    },
-    {
-      title: "Completed",
-      value: completed,
-      description: "Successfully finished ideas", 
-      icon: CheckCircle,
-      trend: `${completionRate}% completed`,
-      isPositive: completed > 0,
-      chartData: monthlyCharts.completedByMonth,
-      chartConfig: {
-        value: {
-          label: "Completed"
+      {
+        title: "Completed",
+        value: completed,
+        description: "Successfully finished ideas", 
+        icon: CheckCircle,
+        trend: completedChange.percentage > 0 
+          ? `${completedChange.isPositive ? '+' : '-'}${completedChange.percentage}% from last month`
+          : "No change from last month",
+        isPositive: completedChange.isPositive,
+        chartData: monthlyCharts.completedByMonth,
+        chartConfig: {
+          value: {
+            label: "Completed"
+          },
         },
-      },
-      showChart: true
-    }
-  ];
+        showChart: true
+      }
+    ];
+  }, [totalIdeas, inProgress, completed, monthlyCharts]);
 
   const gotoIdea = (id: number) => () => {
     router.push(`/dashboard/ideas/${id}`);
+  }
+
+  useEffect(() => {
+    console.log('StatsClient client-side effect:', {
+      dashboardData,
+      timestamp: new Date().toISOString()
+    });
+  }, []);
+
+  if (!isClient) {
+    return (
+      <div className="flex-1 space-y-6 p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-muted-foreground">
+              Welcome to your idea control center
+            </p>
+          </div>
+        </div>
+        <div className="text-center py-12">
+          <div className="animate-pulse">Loading dashboard...</div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -109,7 +165,7 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+          <Button className='bg-rainbow hover:bg-rainbow-hover' variant="default" size="sm">
             <Brain className="h-4 w-4 mr-2" />
             Auto-organize
           </Button>
@@ -378,8 +434,8 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
                           {idea.priority}
                         </Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(idea.created_at).toLocaleDateString('en-US', {
+                      <p className="text-xs text-muted-foreground" suppressHydrationWarning>
+                        {new Date(idea.created_at).toLocaleDateString('es-ES', {
                           day: 'numeric',
                           month: 'short',
                           year: 'numeric'

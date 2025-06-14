@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { toast } from 'sonner';
+import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -221,14 +221,13 @@ export default function CreateIdeaModal({
       };
 
       if (onCreate) {
+        console.log('Creating idea with data:', ideaData);
         await onCreate(ideaData);
         toast.success('Idea created successfully!');
       } else if (href) {
         router.push(href);
         return;
       }
-      
-      toast.success('Idea created successfully!');
       onOpenChangeAction();
       
     } catch (error) {
@@ -432,7 +431,7 @@ export default function CreateIdeaModal({
 
           {/* Buttons */}
           <div className="flex gap-4 pt-4">
-            <Button type="submit" className="flex-1" disabled={loading}>
+            <Button variant="default" type="submit" className="flex-1 bg-rainbow hover:bg-rainbow-hover" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />

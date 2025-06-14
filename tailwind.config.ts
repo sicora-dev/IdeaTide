@@ -53,6 +53,10 @@ export default {
           foreground: 'hsl(var(--card-foreground))'
         }
       },
+      backgroundImage: {
+        'rainbow': 'var(--rainbow)',
+        'rainbow-hover': 'var(--rainbow-hover)',
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',

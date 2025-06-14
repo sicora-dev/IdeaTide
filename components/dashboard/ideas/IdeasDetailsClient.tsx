@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+import { toast } from 'react-hot-toast';
 import {
   Card,
   CardContent,
@@ -53,6 +53,7 @@ import {
 } from 'lucide-react';
 import { toggleFavoriteAction, deleteIdeaAction, updateIdeaAction } from '@/lib/actions/ideas';
 import { SelectIdea } from '@/lib/db/schema';
+import { ConfirmModal } from '@/components/shared/ConfirmModal';
 
 interface IdeaDetailClientProps {
   idea: SelectIdea;
@@ -73,6 +74,10 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
     potential_impact: idea.potential_impact,
     tags: idea.tags?.join(', ') || '',
   });
+
+  useEffect(() => {
+    setIdea(initialIdea);
+  }, [initialIdea]);
 
   const handleToggleFavorite = async () => {
     try {
@@ -228,7 +233,7 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
       </div>
 
       {/* Main Content */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-3 max-h-[70vh] overflow-y-auto p-3">
         {/* Left Column - Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Basic Info */}
@@ -544,29 +549,20 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
                 <CardTitle className="text-base text-red-600">Danger Zone</CardTitle>
               </CardHeader>
               <CardContent>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
+                <ConfirmModal
+                  trigger={
                     <Button variant="destructive" size="sm" className="w-full">
                       <Trash className="h-4 w-4 mr-2" />
                       Delete Idea
                     </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the idea
-                        "{idea.title}" and all its associated data.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
-                        Yes, delete idea
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                  }
+                  title="Are you absolutely sure?"
+                  description={`This action cannot be undone. This will permanently delete the idea "${idea.title}" and all its associated data.`}
+                  onConfirm={handleDelete}
+                  confirmText="Yes, delete idea"
+                  cancelText="Cancel"
+                  confirmVariant="destructive"
+                />
               </CardContent>
             </Card>
           )}
