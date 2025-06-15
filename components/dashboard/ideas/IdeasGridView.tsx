@@ -114,7 +114,7 @@ export function IdeasGridView({
   // Para listas pequeñas, usar grid normal sin virtualización
   if (ideas.length <= 6) {
     return (
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-h-[70vh] h-full overflow-y-auto p-3 scroll-smooth">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 h-full overflow-y-auto p-3 scroll-smooth">
         {ideas.map((idea) => (
           <div key={idea.id}>
             <IdeaCard
@@ -130,14 +130,11 @@ export function IdeasGridView({
     );
   }
 
-  // Para listas grandes, usar TanStack Virtual con medición dinámica
   return (
     <div
       ref={parentRef}
-      className="w-full overflow-y-auto scroll-smooth"
+      className="w-full h-full min-h-0 max-h-[70dvh] overflow-y-auto scroll-smooth"
       style={{ 
-        maxHeight: '70vh',
-        // Mejorar el rendimiento del scroll
         willChange: 'scroll-position'
       }}
     >

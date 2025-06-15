@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'react-hot-toast';
+import { sendSupportEmail } from '@/lib/actions/support';
 
 interface User {
   id: string;
@@ -50,42 +51,12 @@ export function SupportForm({ user }: SupportFormProps) {
     setIsSubmitting(true);
 
     try {
-      // Aquí implementarías la lógica para enviar el formulario
-      // Por ejemplo, una llamada a tu API
-      const response = await fetch('/api/support', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          userId: user?.id,
-        }),
+      await sendSupportEmail({
+        ...formData,
+        type: formData.type,
       });
-
-      if (response.ok) {
-        toast.success('Support request sent successfully! We\'ll get back to you soon.');
-        // Reset form if not authenticated
-        if (!isAuthenticated) {
-          setFormData({
-            name: '',
-            email: '',
-            type: '',
-            subject: '',
-            message: '',
-          });
-        } else {
-          // Only reset non-user fields for authenticated users
-          setFormData(prev => ({
-            ...prev,
-            type: '',
-            subject: '',
-            message: '',
-          }));
-        }
-      } else {
-        throw new Error('Failed to send support request');
-      }
+      toast.success("Support request sent successfully! We'll get back to you soon.");
+      
     } catch (error) {
       toast.error('Failed to send support request. Please try again.');
     } finally {

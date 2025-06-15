@@ -15,7 +15,7 @@ import { LogoutButton } from '../ui/dashboard/user-dropdown/LogoutButton';
 export async function User() {
   try {
     const { user } = await getAuthenticatedUser();
-    
+
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -34,18 +34,16 @@ export async function User() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>{user.full_name || "My Account"}</DropdownMenuLabel>
+          <DropdownMenuLabel>
+            {user.full_name || 'My Account'}
+          </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <Link href="/dashboard/profile">
-              Settings
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Link href="/support">
-              Support
-            </Link>
-          </DropdownMenuItem>
+          <Link href="/dashboard/profile">
+            <DropdownMenuItem className='cursor-pointer w-full'>Settings</DropdownMenuItem>
+          </Link>
+          <Link href="/support">
+            <DropdownMenuItem className='cursor-pointer w-full'>Support</DropdownMenuItem>
+          </Link>
           <DropdownMenuSeparator />
           <DropdownMenuItem>
             <LogoutButton />

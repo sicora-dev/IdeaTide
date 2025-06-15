@@ -36,8 +36,8 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
   } = useIdeasFilters(ideas);
 
   return (
-    <>
-      <div className="flex-1 space-y-6 p-6">
+    <div className="flex flex-col h-full">
+      <div className="flex-1 flex flex-col space-y-6 p-6 min-h-0">
         <IdeasHeader 
           totalIdeas={ideas.length}
           onCreateIdea={() => setShowCreateModal(true)}
@@ -78,6 +78,6 @@ export default function IdeasClient({ initialIdeas }: IdeasClientProps) {
         onCreate={handleCreateIdea}
         onCancel={() => setShowCreateModal(false)}
       />
-    </>
+    </div>
   );
 }

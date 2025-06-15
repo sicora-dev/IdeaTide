@@ -41,7 +41,7 @@ export function IdeasFilters({
         </div>
       </div>
       
-      <div className="flex border rounded-md">
+      <div className="flex border rounded-md max-md:hidden">
         <Button
           variant={viewMode === 'grid' ? 'default' : 'ghost'}
           size="sm"

@@ -233,7 +233,7 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
       </div>
 
       {/* Main Content */}
-      <div className="grid gap-6 lg:grid-cols-3 max-h-[70vh] overflow-y-auto p-3">
+      <div className="grid gap-6 lg:grid-cols-3 max-h-[70dvh] overflow-y-auto p-3">
         {/* Left Column - Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Basic Info */}

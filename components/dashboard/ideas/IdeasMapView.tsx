@@ -53,7 +53,7 @@ export const IdeasMapView = memo(function IdeasMapView({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 p-3">
       <div className="lg:col-span-3 ">
-        <Card className='max-h-[70vh] overflow-y-auto'>
+        <Card className='max-h-[70dvh] overflow-y-auto'>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Map className="h-5 w-5" />
@@ -92,7 +92,7 @@ export const IdeasMapView = memo(function IdeasMapView({
         </Card>
       </div>
 
-      <div className="h-[70vh]">
+      <div className="h-[70dvh]">
         <IdeaDetailsPanel 
           selectedIdea={selectedIdea}
           onViewIdea={onViewIdea}

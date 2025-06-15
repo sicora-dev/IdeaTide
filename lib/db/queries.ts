@@ -153,3 +153,52 @@ export async function getAllIdeasForStats(userId: string): Promise<SelectIdea[]>
     return [];
   }
 }
+
+export async function getIdeaMessages(ideaId: string) {
+  try {
+    const supabase = await createClient();
+    
+    const { data: messages, error } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('idea_id', ideaId)
+      .order('created_at', { ascending: true });
+    
+    if (error) {
+      console.error('Error fetching messages:', error);
+      return [];
+    }
+    
+    return messages || [];
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    return [];
+  }
+}
+
+export async function sendMessage(ideaId: string, userId: string, content: string) {
+  try {
+    const supabase = await createClient();
+    
+    const { data: message, error } = await supabase
+      .from('messages')
+      .insert([{
+        idea_id: ideaId,
+        user_id: userId,
+        content,
+        created_at: new Date().toISOString(),
+      }])
+      .select()
+      .single();
+    
+    if (error || !message) {
+      console.error('Error sending message:', error);
+      return null;
+    }
+    
+    return message;
+  } catch (error) {
+    console.error('Error sending message:', error);
+    return null;
+  }
+}
