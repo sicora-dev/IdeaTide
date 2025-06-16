@@ -4,10 +4,10 @@ import EmptyMessages from "@/components/dashboard/chat/EmptyMessages";
 export default async function ChatPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string };
+  searchParams: Promise<{ [key: string]: string }>;
 }) {
   console.log("ChatPage render");
-
+  const resolvedSearchParams = await searchParams;
 
   const ideas: string | any[] = [];
 
@@ -17,7 +17,7 @@ export default async function ChatPage({
 
   const firstIdeaId = ideas[0].id;
 
-  const query = new URLSearchParams(searchParams).toString();
+  const query = new URLSearchParams(resolvedSearchParams).toString();
   const url = `/dashboard/chat/${firstIdeaId}${query ? `?${query}` : ""}`;
 
   redirect(url);
