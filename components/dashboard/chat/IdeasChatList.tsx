@@ -23,7 +23,7 @@ export default function IdeasChatList() {
   });
 
   return (
-    <div className="bg-base-100 rounded-xl w-full flex flex-col flex-1 overflow-y-auto">
+    <div className="rounded-xl w-full flex flex-col flex-1 overflow-y-auto">
       <div className="overflow-y-auto overflow-x-hidden h-full w-full p-2">
         {/* Loading cuando no se ha inicializado o cuando no hay tickets cargados aún */}
         {loading && userIdeas?.length === 0 ? (
@@ -32,8 +32,8 @@ export default function IdeasChatList() {
           </div>
         ) : userIdeas?.length === 0 && !loading ? (
           <EmptyIdeasChat
-            title={"No ideas found"}
-            description={"No ideas found..."}
+            title="No ideas found"
+            description="You haven't created any ideas yet. Create your first idea to start chatting."
           />
         ) : (
           userIdeas?.map((idea, index) => {

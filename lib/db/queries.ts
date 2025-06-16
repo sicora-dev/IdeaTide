@@ -154,9 +154,10 @@ export async function getAllIdeasForStats(userId: string): Promise<SelectIdea[]>
   }
 }
 
-export async function getIdeaMessages(ideaId: string) {
+export async function getIdeaMessages(ideaId: number) {
   try {
     const supabase = await createClient();
+    console.log('Fetching messages for ideaId:', ideaId);
     
     const { data: messages, error } = await supabase
       .from('messages')
@@ -168,6 +169,7 @@ export async function getIdeaMessages(ideaId: string) {
       console.error('Error fetching messages:', error);
       return [];
     }
+    console.log('Fetched messages:', messages);
     
     return messages || [];
   } catch (error) {
@@ -176,7 +178,7 @@ export async function getIdeaMessages(ideaId: string) {
   }
 }
 
-export async function sendMessage(ideaId: string, userId: string, content: string) {
+export async function sendMessage(ideaId: number, userId: string, content: string) {
   try {
     const supabase = await createClient();
     
@@ -187,6 +189,7 @@ export async function sendMessage(ideaId: string, userId: string, content: strin
         user_id: userId,
         content,
         created_at: new Date().toISOString(),
+        type: 'user'
       }])
       .select()
       .single();

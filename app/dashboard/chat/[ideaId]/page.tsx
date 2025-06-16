@@ -2,6 +2,7 @@
 export const dynamic = "force-dynamic";
 
 import ChatLoader from "@/components/dashboard/chat/ChatLoader";
+import ChatViewSkeleton from "@/components/skeletons/ChatViewSkeleton";
 import { Suspense } from "react";
 
 export default async function ChatPage({
@@ -16,7 +17,7 @@ export default async function ChatPage({
   return (
     <>
       {/* Chat */}
-      <Suspense fallback={<div>Loading chat...</div>}>
+      <Suspense fallback={<ChatViewSkeleton />}>
         <ChatLoader ideaId={ideaId} />
       </Suspense>
     </>

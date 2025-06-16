@@ -1,15 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IdeasChatToolbar } from "@/components/dashboard/chat/IdeasChatToolbar";
 import IdeasChatList from "./IdeasChatList";
+import { usePathname } from "next/navigation";
 
 export default function IdeasChatPanel() {
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = useState(false);
+  const [shouldHideOnMobile, setShouldHideOnMobile] = useState(false);
+  const pathname = usePathname();
+  
+  useEffect(() => {
+    const pathSegments = pathname.split('/').filter(Boolean);
+    
+    const chatIndex = pathSegments.findIndex(segment => segment === 'chat');
+    const hasIdAfterChat = chatIndex !== -1 && pathSegments[chatIndex + 1];
+    
+    setShouldHideOnMobile(!!hasIdAfterChat);
+  }, [pathname]);
 
   return (
     <div
-      className={`max-md:pr-6 max-md:w-full max-md:absolute max-md:-translate-x-[200dvw] relative flex  ${isFiltersPanelOpen ? "gap-5" : ""}`}
+      className={`max-md:w-full max-md:overflow-x-hidden relative flex  ${isFiltersPanelOpen ? "gap-5" : ""} ${shouldHideOnMobile ? "max-md:hidden" : ""}`}
     >
       <div className="max-md:w-full">
         <div className="h-full w-full overflow-y-hidden flex md:w-96 flex-col">

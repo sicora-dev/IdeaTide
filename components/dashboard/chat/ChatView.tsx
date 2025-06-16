@@ -2,13 +2,20 @@
 
 import ChatBubble from "./MessageBubble";
 import ChatInput from "./ChatInput";
-import { use } from "react";
+import { use, useEffect, useState } from "react";
 import { SelectIdea } from "@/lib/db/schema";
+import useSWR from "swr";
+import { getAuthenticatedUser } from "@/libs/supabase/client/auth";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 interface ChatViewProps {
   ideaPromise: Promise<SelectIdea | null>;
   messagesPromise: Promise<any[]>;
 }
+
+const fetcher = () => getAuthenticatedUser()
 
 export default function ChatView({
   ideaPromise,
@@ -16,22 +23,54 @@ export default function ChatView({
 }: ChatViewProps) {
   const ideaDetails = use(ideaPromise);
   const initialMessages = use(messagesPromise);
+  const [messages, setMessages] = useState<any[]>([]);
+  const { data: user, isLoading: loading } = useSWR('user-info-chat', fetcher, {
+    revalidateOnFocus: false,
+    revalidateIfStale: false,
+    dedupingInterval: 60000,
+    suspense: false,
+  });
+
+  useEffect(() => {
+    const sortedMessages = [...initialMessages].sort(
+      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    );
+    setMessages(sortedMessages);
+  }, [initialMessages]);
 
   console.log("ChatView render");
-  const sortedMessages = [...initialMessages].sort(
-    (a, b) => new Date(a.received_at).getTime() - new Date(b.received_at).getTime()
-  );
+  console.log("messagesPromise", initialMessages);
+
+  const onAddMessage = (newMessageContent: string) => {
+    // Crear el mensaje optimista (se muestra inmediatamente)
+    const optimisticMessage = {
+      id: `temp-${Date.now()}`, // ID temporal
+      content: newMessageContent,
+      created_at: new Date().toISOString(),
+      type: 'user',
+      user_id: user?.user.id,
+      idea_id: ideaDetails?.id,
+    };
+
+    // Actualizar el estado local inmediatamente
+    setMessages(prevMessages => [...prevMessages, optimisticMessage]);
+  };
 
   return (
     <>
-      <div className={`max-md:absolute max-md:translate-x-[100dvw] overflow-y-auto grow-1 flex-1`}>
+      <div className={`overflow-y-auto grow-1 flex-1`}>
         <div
-          className={`flex flex-col overflow-y-auto h-full rounded-xl bg-base-100 md:relative top-0 left-0 transition-transform duration-300 translate-x-full md:translate-x-0`}
+          className={`flex flex-col overflow-y-auto h-full border-2 rounded-md bg-popover  md:relative top-0 left-0 transition-transform duration-300`}
         >
           {/* Header del Chat */}
-          <div className="m-4 p-4 bg-base-200 flex items-center justify-between rounded-xl">
+          <div className="m-4 p-4 flex items-center justify-between rounded-xl bg-secondary">
             {/* Izquierda: Botón de volver y Nombre del cliente */}
             <div className="flex items-center gap-3">
+              <Link href="/dashboard/chat">
+                <Button variant="ghost" size="icon" className="text-muted-foreground md:hidden">
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
+              </Link>
               <h3 className="font-bold text-lg capitalize">{ideaDetails?.title}</h3>        
             </div>
           </div>
@@ -46,13 +85,11 @@ export default function ChatView({
             )}
 
             {/* Listado de Mensajes */}
-            {sortedMessages.map((msg, index, array) => {
-              const currentDate = new Date(msg.received_at).toDateString();
+            {messages.map((msg, index, array) => {
+              const currentDate = new Date(msg.created_at).toDateString();
               const previousDate =
-                index > 0 ? new Date(array[index - 1].received_at).toDateString() : null;
-
-            const showDateLabel = currentDate !== previousDate;
-            const nextMessage = index < array.length - 1 ? array[index + 1] : null;
+                index > 0 ? new Date(array[index - 1].created_at).toDateString() : null;
+              const showDateLabel = currentDate !== previousDate;
 
               return (
                 <div key={`${msg.id}-${index}`}>
@@ -61,7 +98,7 @@ export default function ChatView({
                       <div className="rounded-lg py-2 px-4 w-fit">
                         {currentDate === new Date().toDateString()
                           ? "Today"
-                          : new Date(msg.received_at).toLocaleDateString("en-US", {
+                          : new Date(msg.created_at).toLocaleDateString("en-US", {
                               weekday: "long",
                               month: "long",
                               day: "numeric",
@@ -83,7 +120,8 @@ export default function ChatView({
           <div>
             <ChatInput
               ideaId={ideaDetails?.id}
-              addMessage={() => {}}
+              userId={user?.user.id}
+              onMessageSent={onAddMessage}
             />
           </div>
         </div>

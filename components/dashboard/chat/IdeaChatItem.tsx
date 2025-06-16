@@ -21,14 +21,14 @@ export function IdeaChatItem({
   return (
     <div>
       <div
-        className={`p-3 rounded-xl cursor-pointer transition-colors border-transparent hover:bg-base-200 ${
-          isSelected ? "sm:bg-base-200 sm:border sm:border-accent" : ""
+        className={`p-3 rounded-xl cursor-pointer transition-colors border-transparent hover:bg-input ${
+          isSelected ? "sm:border sm:border-accent" : ""
         }`}
       >
         {/* Título del idea y estado */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex gap-1 items-center max-w-[60%]">
-            <h3 className="text-base font-bold capitalize truncate">
+            <h3 className="font-bold capitalize truncate">
               {idea.title?.toLocaleLowerCase() ?? "unknown"}
             </h3>
           </div>

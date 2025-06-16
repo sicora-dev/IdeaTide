@@ -9,7 +9,7 @@ interface ChatServerProps {
   ideaId: number;
 }
 
-export default function ChatLoader({ ideaId }: ChatServerProps) {
+export default async function ChatLoader({ ideaId }: ChatServerProps) {
   const ideaPromise = fetchIdeaById(ideaId);
   const messagesPromise = ideaPromise.then((idea: SelectIdea | null) => {
     if (!idea) {

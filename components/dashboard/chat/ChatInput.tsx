@@ -1,18 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import {  useState } from "react";
 import { SendHorizonal } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import toast from "react-hot-toast";
 
 interface ChatInputProps {
   ideaId: number | undefined;
-  addMessage: (message: any) => void;
-  onMessageSent?: () => void
+  userId: string;
+  onMessageSent?: (value: string) => void
 }
 
 export default function ChatInput({
   ideaId,
-  addMessage,
+  userId,
   onMessageSent
 }: ChatInputProps) {
   const [input, setInput] = useState<string>("");
@@ -21,9 +22,42 @@ export default function ChatInput({
     setInput(value);
   };
 
-  const handleSend = () => {
-    console.log("Sending message:", input);
-  }
+  const handleSend = async () => {
+    if (!input.trim() || !ideaId || !userId) return;
+
+    
+    try {
+      const response = await fetch('/api/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: input.trim(),
+          ideaId: ideaId,
+          userId: userId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      const result = await response.json();
+      
+      // Limpiar el input después del envío exitoso
+      setInput("");
+      
+      // Llamar al callback si existe
+      if (onMessageSent) {
+        onMessageSent(input);
+      }
+      
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error('Error sending message. Please try again.');
+    }
+  };
 
   return (
     <div className="px-2 border-2 border-base-200 rounded-box mx-4 mb-4 mt-2">
