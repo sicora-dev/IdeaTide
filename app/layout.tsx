@@ -1,7 +1,6 @@
 import './globals.css';
 
 import { Analytics } from "@vercel/analytics/next"
-import { Toaster } from "react-hot-toast";
 import Providers from './providers';
 
 export const metadata = {

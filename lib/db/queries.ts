@@ -1,3 +1,6 @@
+"use server"
+
+import { User } from '../types/users';
 import { type SelectIdea, type InsertIdea } from './schema';
 import { createClient } from 'libs/supabase/server/server';
 
@@ -202,6 +205,29 @@ export async function sendMessage(ideaId: number, userId: string, content: strin
     return message;
   } catch (error) {
     console.error('Error sending message:', error);
+    return null;
+  }
+}
+
+export async function updateUserData(userData: Partial<User>) {
+  try {
+    const supabase = await createClient();
+    
+    const { data, error } = await supabase.auth.updateUser({
+      email: userData.email,
+      password: userData.password,
+      phone: userData.phone
+
+    })
+    
+    if (error) {
+      console.error('Error updating user data:', error);
+      return null;
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error updating user data:', error);
     return null;
   }
 }

@@ -1,19 +1,20 @@
 export interface User {
   id: string;
   email: string;
-  full_name?: string | null;
-  image?: string | null;
+  full_name?: string;
+  password?: string;
+  image?: string;
   created_at?: Date;
   updated_at?: Date;
   last_sign_in_at?: Date | null;
-  phone?: string | null;
+  phone?: string;
 }
 
 export interface CreateUserInput {
   email: string;
-  full_name?: string | null;
-  image?: string | null;
-  phone?: string | null;
+  full_name?: string;
+  image?: string;
+  phone?: string;
 }
 
 export interface UpdateUserInput {

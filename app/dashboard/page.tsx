@@ -1,3 +1,4 @@
+
 import { Suspense } from 'react';
 import StatsClient from '@/components/dashboard/StatsClient';
 import { getDashboardStats } from '@/lib/actions/ideas';

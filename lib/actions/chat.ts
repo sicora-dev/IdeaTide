@@ -1,3 +1,4 @@
+"use server"
 import { getIdeaMessages, sendMessage } from "../db/queries";
 
 export async function fetchMessages(ideaId: number) {
