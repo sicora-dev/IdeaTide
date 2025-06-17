@@ -21,6 +21,7 @@ export default async function DashboardLayout({
   return (
     <Providers>
       <div className="flex flex-col h-screen w-full bg-muted/40">
+      s
         <DesktopNav />
         <div className="flex-1 flex flex-col h-0 sm:gap-4 sm:py-4 sm:pl-14 overflow-hidden">
           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 max-md:p-3">
