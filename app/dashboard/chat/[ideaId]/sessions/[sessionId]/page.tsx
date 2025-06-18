@@ -8,10 +8,10 @@ import { getAuthenticatedUser } from "@/libs/supabase/client/auth";
 import { getChatMessagesBySession, getIdeaById, getSessionById } from "@/lib/db/queries";
 
 type Props = {
-  params: {
+  params: Promise<{
     ideaId: string;
     sessionId: string;
-  };
+  }>;
 };
 
 export default async function ChatSessionPage({ params }: Props) {
@@ -20,8 +20,8 @@ export default async function ChatSessionPage({ params }: Props) {
 
   if (!userId) notFound();
 
-  const ideaId = Number(params.ideaId);
-  const sessionId = params.sessionId;
+  const { ideaId: ideaIdParam, sessionId } = await params;
+  const ideaId = Number(ideaIdParam);
 
   if (isNaN(ideaId) || !sessionId) notFound();
 
