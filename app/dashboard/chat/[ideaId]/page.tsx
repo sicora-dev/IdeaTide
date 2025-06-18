@@ -3,7 +3,10 @@ export const dynamic = "force-dynamic";
 
 import ChatLoader from "@/components/dashboard/chat/ChatLoader";
 import ChatViewSkeleton from "@/components/skeletons/ChatViewSkeleton";
-import { Suspense } from "react";
+import { getOrCreateLatestSession } from "@/lib/actions/chat";
+import { getIdeaSessions } from "@/lib/db/queries";
+import { getAuthenticatedUser } from "@/libs/supabase/server/auth";
+import { redirect } from "next/navigation";
 
 export default async function ChatPage({
   params
@@ -11,15 +14,13 @@ export default async function ChatPage({
   params: Promise<{ ideaId: number }>;
 }) {
   const ideaId = (await params).ideaId;
+  const { user } = await getAuthenticatedUser()
+  const session = await getOrCreateLatestSession(ideaId, user.id);
 
-  console.log("ChatPage render");
+  if (!session) {
+    return <ChatViewSkeleton />;
+  }
 
-  return (
-    <>
-      {/* Chat */}
-      <Suspense fallback={<ChatViewSkeleton />}>
-        <ChatLoader ideaId={ideaId} />
-      </Suspense>
-    </>
-  );
+  const url = `/dashboard/chat/${ideaId}/sessions/${session.id}`;
+  redirect(url);
 }

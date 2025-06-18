@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Home, Lightbulb, Settings } from "lucide-react";
+import { Home, Lightbulb, MessageCircleIcon, Settings } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { NavItem } from "@/components/navigation/NavItem";
 import { Logo } from "@/components/ui/shared/Logo";
@@ -16,6 +16,9 @@ export function DesktopNav() {
         </NavItem>
         <NavItem href="/dashboard/ideas" label="My Ideas">
           <Lightbulb className="h-5 w-5" />
+        </NavItem>
+        <NavItem href="/dashboard/chat" label="Ideas Chat">
+          <MessageCircleIcon className="h-5 w-5" />
         </NavItem>
       </nav>
       <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">

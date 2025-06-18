@@ -15,10 +15,11 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { CartesianGrid, Line, LineChart, XAxis } from 'recharts';
-import { Brain, TrendingUp, TrendingDown, Zap, Lightbulb, PlayCircle, CheckCircle } from 'lucide-react';
+import { Brain, TrendingUp, TrendingDown, Zap, Lightbulb, PlayCircle, CheckCircle, House } from 'lucide-react';
 import { SelectIdea } from '@/lib/db/schema';
 import { useRouter } from 'next/navigation';
 import {  useEffect, useMemo, useState } from 'react';
+import { findSimilarIdeas } from '@/lib/db/queries';
 
 interface DashboardData {
   totalIdeas: number;
@@ -129,6 +130,13 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
     router.push(`/dashboard/ideas/${id}`);
   }
 
+  const handleCombineIdea = async () => {
+    // Placeholder for combine idea logic
+    const result = await findSimilarIdeas("16")
+    console.log('Similar ideas found:', result);
+    console.log('Combining similar ideas...');
+  };
+
   useEffect(() => {
     console.log('StatsClient client-side effect:', {
       dashboardData,
@@ -141,7 +149,10 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
       <div className="flex-1 space-y-6 p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+              <House className="h-8 w-8" />
+              Dashboard
+            </h1>
             <p className="text-muted-foreground">
               Welcome to your idea control center
             </p>
@@ -159,7 +170,10 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+            <House className="h-8 w-8" />
+            Dashboard
+          </h1>
           <p className="text-muted-foreground">
             Welcome to your idea control center
           </p>
@@ -467,14 +481,14 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <Button onClick={handleCombineIdea} variant="ghost" className="flex flex-col w-full p-3 gap-0 items-start h-full bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm font-medium text-blue-900">
                   💡 Combine similar ideas
                 </p>
                 <p className="text-xs text-blue-700 mt-1">
                   You have {totalIdeas} ideas about mobile apps that could be merged
                 </p>
-              </div>
+              </Button>
               <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
                 <p className="text-sm font-medium text-green-900">
                   🚀 Prioritize by impact

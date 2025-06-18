@@ -1,5 +1,6 @@
 "use server"
 
+import { generateEmbedding } from '@/libs/gemini/gemini';
 import { User } from '../types/users';
 import { type SelectIdea, type InsertIdea } from './schema';
 import { createClient } from 'libs/supabase/server/server';
@@ -75,6 +76,17 @@ export async function createIdea(data: InsertIdea): Promise<SelectIdea | null> {
       console.error('Error creating idea:', error);
       return null;
     }
+
+    const { id, title, description } = result
+    const embedding = await generateEmbedding(`${title}\n${description}`)
+    const vectorString = JSON.stringify(Array.from(embedding || [])[0]?.values)
+    // Guardar el embedding
+    const { error: updateError } = await supabase
+      .from('ideas')
+      .update({ embedding: vectorString })
+      .eq('id', id)
+
+    if (updateError) throw updateError
     
     return result;
   } catch (error) {
@@ -84,7 +96,7 @@ export async function createIdea(data: InsertIdea): Promise<SelectIdea | null> {
 }
 
 // Actualizar idea
-export async function updateIdea(id: number, userId: string, data: Partial<InsertIdea>): Promise<SelectIdea | null> {
+export async function updateIdea(ideaId: number, userId: string, data: Partial<InsertIdea>): Promise<SelectIdea | null> {
   try {
     const supabase = await createClient();
     
@@ -94,7 +106,7 @@ export async function updateIdea(id: number, userId: string, data: Partial<Inser
         ...data,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', id)
+      .eq('id', ideaId)
       .eq('user_id', userId)
       .select()
       .single();
@@ -103,6 +115,17 @@ export async function updateIdea(id: number, userId: string, data: Partial<Inser
       console.error('Error updating idea:', error);
       return null;
     }
+    
+    const { id, title, description } = result
+    const embedding = await generateEmbedding(`${title}\n${description}`)
+    const vectorString = JSON.stringify(Array.from(embedding || [])[0]?.values)
+    // Guardar el embedding
+    const { error: updateError } = await supabase
+      .from('ideas')
+      .update({ embedding: vectorString })
+      .eq('id', id)
+
+    if (updateError) throw updateError
     
     return result;
   } catch (error) {
@@ -157,6 +180,31 @@ export async function getAllIdeasForStats(userId: string): Promise<SelectIdea[]>
   }
 }
 
+export async function findSimilarIdeas(ideaId: string, limit: number = 5) {
+  const supabase = await createClient();
+
+  const { data: baseIdea, error: ideaError } = await supabase
+    .from('ideas')
+    .select('title, description')
+    .eq('id', ideaId)
+    .single()
+
+  if (ideaError) throw ideaError
+
+  const embedding = await generateEmbedding(`${baseIdea.title}\n${baseIdea.description}`)
+  console.log('Generated embedding for idea:', embedding);
+
+  // Buscar ideas similares
+  const { data: related, error } = await supabase.rpc('match_ideas', {
+    query_embedding: JSON.stringify(Array.from(embedding || [])[0]?.values),
+    match_count: 5
+  })
+
+  if (error) throw error
+
+  return related
+}
+
 export async function getIdeaMessages(ideaId: number) {
   try {
     const supabase = await createClient();
@@ -181,18 +229,19 @@ export async function getIdeaMessages(ideaId: number) {
   }
 }
 
-export async function sendMessage(ideaId: number, userId: string, content: string) {
+export async function sendMessage(userId: string, sessionId: string, content: string, type: 'user' | 'ai' | 'system' = 'user') {
   try {
     const supabase = await createClient();
     
     const { data: message, error } = await supabase
-      .from('messages')
+      .from('chat_messages')
       .insert([{
-        idea_id: ideaId,
         user_id: userId,
+        session_id: sessionId,
         content,
         created_at: new Date().toISOString(),
-        type: 'user'
+        updated_at: new Date().toISOString(),
+        type: type
       }])
       .select()
       .single();
@@ -228,6 +277,105 @@ export async function updateUserData(userData: Partial<User>) {
     return data;
   } catch (error) {
     console.error('Error updating user data:', error);
+    return null;
+  }
+}
+
+export async function getChatMessagesBySession(sessionId: string, userId: string) {
+  try {
+    const supabase = await createClient();
+
+    const { data: messages, error } = await supabase
+      .from("chat_messages")
+      .select("*")
+      .eq("session_id", sessionId)
+      .eq("user_id", userId)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching chat messages:", error);
+      return [];
+    }
+
+    return messages || [];
+  } catch (error) {
+    console.error("Unexpected error fetching chat messages:", error);
+    return [];
+  }
+}
+
+export async function getSessionById(sessionId: string, userId: string) {
+  try { 
+    const supabase = await createClient();
+
+    const { data: session, error } = await supabase
+      .from("chat_sessions")
+      .select("*")
+      .eq("id", sessionId)
+      .eq("user_id", userId)
+      .single();
+
+    if (error || !session) {
+      console.error("Error fetching session:", error);
+      return null;
+    }
+
+    return session;
+  } catch (error) {
+    console.error("Unexpected error fetching session:", error);
+    return null;
+  }
+}
+
+export async function getIdeaSessions(ideaId: number, userId: string) {
+  try {
+    const supabase = await createClient();
+
+    const { data: sessions, error } = await supabase
+      .from("chat_sessions")
+      .select("*")
+      .eq("idea_id", ideaId)
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching sessions:", error);
+      return [];
+    }
+
+    return sessions || [];
+  } catch (error) {
+    console.error("Unexpected error fetching sessions:", error);
+    return [];
+  }
+}
+
+export async function createSession(ideaId: number, userId: string) {
+  try {
+    const supabase = await createClient();
+
+    const { data: session, error } = await supabase
+      .from("chat_sessions")
+      .insert([
+        {
+          idea_id: ideaId,
+          user_id: userId,
+          title: "Nueva sesión",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      ])
+      .select()
+      .single();
+
+    if (error || !session) {
+      console.error("Error creating session:", error);
+      return null;
+    }
+
+    return session;
+  } catch (error) {
+    console.error("Unexpected error creating session:", error);
     return null;
   }
 }

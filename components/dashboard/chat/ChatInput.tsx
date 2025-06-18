@@ -8,12 +8,14 @@ import toast from "react-hot-toast";
 interface ChatInputProps {
   ideaId: number | undefined;
   userId: string;
-  onMessageSent?: (value: string) => void
+  sessionId: string;
+  onMessageSent?: (userInput: string, aiResponse: string) => void
 }
 
 export default function ChatInput({
   ideaId,
   userId,
+  sessionId,
   onMessageSent
 }: ChatInputProps) {
   const [input, setInput] = useState<string>("");
@@ -27,30 +29,32 @@ export default function ChatInput({
 
     
     try {
-      const response = await fetch('/api/messages', {
+      const response = await fetch('/api/messages/ai', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          content: input.trim(),
+          message: input.trim(),
           ideaId: ideaId,
           userId: userId,
+          sessionId: sessionId
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to send message');
+      if (response.status != 200) {
+        throw new Error('Failed to send message: ' + response.statusText);
       }
 
       const result = await response.json();
+      console.log('Message sent successfully 🎉:', result);
       
       // Limpiar el input después del envío exitoso
       setInput("");
       
       // Llamar al callback si existe
       if (onMessageSent) {
-        onMessageSent(input);
+        onMessageSent(input, result.response);
       }
       
     } catch (error) {

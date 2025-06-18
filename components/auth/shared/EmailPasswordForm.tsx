@@ -62,7 +62,6 @@ export function EmailPasswordForm({
           <Label htmlFor="email" className="text-slate-700 font-medium">
             Email address
           </Label>
-          <Button></Button>
           <Input
             id="email"
             type="email"

@@ -13,6 +13,7 @@ import Link from "next/link";
 interface ChatViewProps {
   ideaPromise: Promise<SelectIdea | null>;
   messagesPromise: Promise<any[]>;
+  sessionPromise: Promise<any>;
 }
 
 const fetcher = () => getAuthenticatedUser()
@@ -20,9 +21,11 @@ const fetcher = () => getAuthenticatedUser()
 export default function ChatView({
   ideaPromise,
   messagesPromise,
+  sessionPromise
 }: ChatViewProps) {
   const ideaDetails = use(ideaPromise);
   const initialMessages = use(messagesPromise);
+  const sessionDetails = use(sessionPromise);
   const [messages, setMessages] = useState<any[]>([]);
   const { data: user, isLoading: loading } = useSWR('user-info-chat', fetcher, {
     revalidateOnFocus: false,
@@ -41,19 +44,25 @@ export default function ChatView({
   console.log("ChatView render");
   console.log("messagesPromise", initialMessages);
 
-  const onAddMessage = (newMessageContent: string) => {
-    // Crear el mensaje optimista (se muestra inmediatamente)
-    const optimisticMessage = {
-      id: `temp-${Date.now()}`, // ID temporal
-      content: newMessageContent,
+  const onAddMessage = (newUserMessage: string, aiResponse: string) => {
+    const userMessage = {
+      id: `temp-user-${Date.now()}`,
+      content: newUserMessage,
       created_at: new Date().toISOString(),
-      type: 'user',
+      type: 'user' as const,
       user_id: user?.user.id,
-      idea_id: ideaDetails?.id,
     };
 
-    // Actualizar el estado local inmediatamente
-    setMessages(prevMessages => [...prevMessages, optimisticMessage]);
+    const aiMessage = {
+      id: `temp-ai-${Date.now()}`,
+      content: aiResponse,
+      created_at: new Date().toISOString(),
+      type: 'ai' as const,
+      user_id: null, // La IA no tiene un user_id
+    };
+
+    // Actualizar el estado local con ambos mensajes
+    setMessages(prevMessages => [...prevMessages, userMessage, aiMessage]);
   };
 
   return (
@@ -121,6 +130,7 @@ export default function ChatView({
             <ChatInput
               ideaId={ideaDetails?.id}
               userId={user?.user.id}
+              sessionId={sessionDetails?.id}
               onMessageSent={onAddMessage}
             />
           </div>

@@ -4,16 +4,16 @@ import { sendMessage } from '@/lib/db/queries';
 
 export async function POST(request: Request) {
   try {
-    const { ideaId, userId, content } = await request.json();
+    const { userId, sessionId, content, type } = await request.json();
     
-    if (!ideaId || !userId || !content) {
+    if (!sessionId || !userId || !content) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
-    const result = await sendMessage(ideaId.toString(), userId, content);
+    const result = await sendMessage(userId, sessionId, content, type);
     
     if (!result) {
       return NextResponse.json(
