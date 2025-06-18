@@ -65,7 +65,7 @@ export default function ChatInput({
   };
 
   return (
-    <div className="px-2 border-2 border-base-200 rounded-box mx-4 mb-4 mt-2 flex">
+    <div className="px-2 rounded-box mx-4 mb-4 mt-2 flex">
       <div className={`w-full flex items-center p-2`}>
         <Textarea
         className="resize-none w-full h-16 bg-secondary border-0 focus:ring-0 focus:outline-none"

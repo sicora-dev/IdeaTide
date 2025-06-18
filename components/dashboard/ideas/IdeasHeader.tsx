@@ -11,7 +11,9 @@ export function IdeasHeader({ totalIdeas, onCreateIdea }: IdeasHeaderProps) {
     <div className="flex md:flex-row flex-col space-y-2 space-x-2 items-center justify-between">
       <div className='flex flex-col space-y-1'>
         <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-          <Lightbulb className="h-8 w-8" />
+          <div className="p-3 rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
+            <Lightbulb className="h-6 w-6" />
+          </div>
           My Ideas
         </h1>
         <p className="text-muted-foreground">

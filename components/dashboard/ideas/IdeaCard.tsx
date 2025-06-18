@@ -33,6 +33,10 @@ import {
   MoreHorizontal,
   Trash,
   Eye,
+  Zap,
+  Target,
+  Calendar,
+  Tag,
 } from 'lucide-react';
 import { toggleFavoriteAction, deleteIdeaAction, updateIdeaAction } from '@/lib/actions/ideas';
 import { SelectIdea } from '@/lib/db/schema';
@@ -171,11 +175,11 @@ export default function IdeaCard({ idea, onUpdateAction, onDeleteAction, onViewA
   };
 
   const getStatusBadge = (status: string) => {
-    const variants = {
-      'new': 'default',
-      'in_progress': 'destructive',
-      'under_review': 'secondary',
-      'completed': 'outline'
+    const statusConfig = {
+      'new': { variant: 'default', color: 'bg-blue-100 text-blue-800 border-blue-200' },
+      'in_progress': { variant: 'destructive', color: 'bg-orange-100 text-orange-800 border-orange-200' },
+      'under_review': { variant: 'secondary', color: 'bg-purple-100 text-purple-800 border-purple-200' },
+      'completed': { variant: 'outline', color: 'bg-green-100 text-green-800 border-green-200' }
     } as const;
     
     const statusTranslations: Record<string, string> = {
@@ -185,18 +189,19 @@ export default function IdeaCard({ idea, onUpdateAction, onDeleteAction, onViewA
       'completed': 'Completed'
     };
 
+    const config = statusConfig[status as keyof typeof statusConfig];
     return (
-      <Badge variant={variants[status as keyof typeof variants] || 'default'}>
+      <Badge variant="outline" className={`text-xs font-medium ${config?.color || 'bg-gray-100 text-gray-800 border-gray-200'}`}>
         {statusTranslations[status] || status.replace('_', ' ')}
       </Badge>
     );
   };
 
   const getPriorityBadge = (priority: string) => {
-    const variants = {
-      'high': 'destructive',
-      'medium': 'secondary',
-      'low': 'outline'
+    const priorityConfig = {
+      'high': 'bg-red-100 text-red-800 border-red-200',
+      'medium': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      'low': 'bg-green-100 text-green-800 border-green-200'
     } as const;
 
     const priorityTranslations: Record<string, string> = {
@@ -206,15 +211,18 @@ export default function IdeaCard({ idea, onUpdateAction, onDeleteAction, onViewA
     };
     
     return (
-      <Badge variant={variants[priority as keyof typeof variants] || 'outline'}>
+      <Badge variant="outline" className={`text-xs font-medium ${priorityConfig[priority as keyof typeof priorityConfig] || 'bg-gray-100 text-gray-800 border-gray-200'}`}>
         {priorityTranslations[priority] || priority}
       </Badge>
     );
   };
 
   return (
-    <Card ref={cardRef} className="hover:shadow-lg transition-shadow flex flex-col h-full">
-      <CardHeader className="pb-3 flex-shrink-0">
+    <Card 
+      ref={cardRef} 
+      className="group hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:scale-[1.02] flex flex-col h-full border-2 hover:border-primary/20 bg-gradient-to-br from-card to-card/50"
+    >
+      <CardHeader className="pb-4 flex-shrink-0">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
             {/* Editable Title */}
@@ -223,7 +231,7 @@ export default function IdeaCard({ idea, onUpdateAction, onDeleteAction, onViewA
                 <Input
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
-                  className="text-base font-semibold h-8"
+                  className="text-base font-semibold h-9 border-primary/30 focus:border-primary"
                   onBlur={handleSaveField}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleSaveField();
@@ -234,45 +242,40 @@ export default function IdeaCard({ idea, onUpdateAction, onDeleteAction, onViewA
               </div>
             ) : (
               <CardTitle 
-                className="text-lg flex items-center gap-2 truncate cursor-pointer hover:bg-gray-50 p-1 rounded"
+                className="text-lg flex items-center gap-3 truncate cursor-pointer hover:bg-accent/50 p-2 rounded-lg transition-colors duration-200"
                 onClick={() => handleStartEdit('title', idea.title)}
               >
                 <button
                   onClick={handleToggleFavorite}
-                  className="hover:scale-110 transition-transform flex-shrink-0"
+                  className="hover:scale-110 transition-transform duration-200 flex-shrink-0"
                 >
                   <Star 
-                    className={`h-4 w-4 ${idea.is_favorite ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400 hover:text-yellow-400'}`} 
+                    className={`h-5 w-5 ${idea.is_favorite ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400 hover:text-yellow-400'} transition-colors`} 
                   />
                 </button>
-                <span className="truncate">{idea.title}</span>
+                <span className="truncate group-hover:text-primary transition-colors">{idea.title}</span>
               </CardTitle>
             )}
             
-            {/* Categories (not editable) */}
-            <div className="flex gap-2 mt-2">
-              <Badge variant="outline" className="text-xs">
-                <span className=' truncate'>
-
-                {idea.category}
-                </span>
+            {/* Categories */}
+            <div className="flex gap-2 mt-3">
+              <Badge variant="outline" className="text-xs bg-primary/5 text-primary border-primary/20">
+                <span className="truncate max-w-20">{idea.category}</span>
               </Badge>
-              <Badge variant="outline" className="text-xs">
-                <span className='truncate'>
-                  {idea.subcategory}
-                </span>
+              <Badge variant="outline" className="text-xs bg-secondary/50 text-secondary-foreground border-secondary/30">
+                <span className="truncate max-w-20">{idea.subcategory}</span>
               </Badge>
             </div>
           </div>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="flex-shrink-0">
+              <Button variant="ghost" size="sm" className="flex-shrink-0 hover:bg-accent/50 transition-colors">
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => onViewAction(idea.id)}>
+            <DropdownMenuContent className="w-48">
+              <DropdownMenuItem onClick={() => onViewAction(idea.id)} className="cursor-pointer">
                 <Eye className="h-4 w-4 mr-2" />
                 View details
               </DropdownMenuItem>
@@ -280,7 +283,7 @@ export default function IdeaCard({ idea, onUpdateAction, onDeleteAction, onViewA
               <ConfirmModal
                 trigger={
                   <DropdownMenuItem 
-                    className="text-red-600"
+                    className="text-red-600 cursor-pointer focus:text-red-600"
                     onSelect={(e) => e.preventDefault()}
                   >
                     <Trash className="h-4 w-4 mr-2" />
@@ -299,16 +302,16 @@ export default function IdeaCard({ idea, onUpdateAction, onDeleteAction, onViewA
         </div>
       </CardHeader>
       
-      <CardContent className="flex-1 flex flex-col">
+      <CardContent className="flex-1 flex flex-col pt-0">
         <div className="flex-1 flex flex-col">
           {/* Editable Description */}
           {editingField === 'description' ? (
-            <div className="flex-1 mb-3">
+            <div className="flex-1 mb-4">
               <Textarea
                 value={editValue}
                 onChange={(e) => setEditValue(e.target.value)}
                 rows={3}
-                className="text-sm resize-none"
+                className="text-sm resize-none border-primary/30 focus:border-primary"
                 onBlur={handleSaveField}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && e.ctrlKey) handleSaveField();
@@ -319,7 +322,7 @@ export default function IdeaCard({ idea, onUpdateAction, onDeleteAction, onViewA
             </div>
           ) : (
             <CardDescription 
-              className="text-sm leading-relaxed flex-1 line-clamp-3 cursor-pointer hover:bg-gray-50 p-1 rounded mb-3"
+              className="text-sm leading-relaxed flex-1 line-clamp-3 cursor-pointer hover:bg-accent/30 p-2 rounded-lg transition-colors duration-200 mb-4"
               onClick={() => handleStartEdit('description', idea.description)}
             >
               {idea.description}
@@ -328,12 +331,12 @@ export default function IdeaCard({ idea, onUpdateAction, onDeleteAction, onViewA
           
           {/* Editable Tags */}
           {editingField === 'tags' ? (
-            <div className="mb-3">
+            <div className="mb-4">
               <Input
                 value={editValue}
                 onChange={(e) => setEditValue(e.target.value)}
                 placeholder="tag1, tag2, tag3"
-                className="text-sm h-7"
+                className="text-sm h-8 border-primary/30 focus:border-primary"
                 onBlur={handleSaveField}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleSaveField();
@@ -344,18 +347,17 @@ export default function IdeaCard({ idea, onUpdateAction, onDeleteAction, onViewA
             </div>
           ) : (
             <div 
-              className="flex-nowrap gap-1 mb-3 min-h-[20px] cursor-pointer hover:bg-gray-50 p-1 rounded block"
+              className="flex flex-wrap gap-2 mb-4 min-h-[24px] cursor-pointer hover:bg-accent/30 p-2 rounded-lg transition-colors duration-200"
               onClick={() => handleStartEdit('tags', idea.tags?.join(', ') || '')}
             >
-              {idea.tags?.map((tag, tagIndex) => (
-                <Badge key={tagIndex} variant="secondary" className="text-xs">
-                  <span className='truncate max-w-24'>
-                    {tag}
-                  </span>
+              <Tag className="h-3 w-3 text-muted-foreground mt-0.5" />
+              {idea.tags?.slice(0, 3).map((tag, tagIndex) => (
+                <Badge key={tagIndex} variant="secondary" className="text-xs bg-secondary/30 hover:bg-secondary/50 transition-colors">
+                  <span className="truncate max-w-20">{tag}</span>
                 </Badge>
-              )).slice(0, 3)}
+              ))}
               {idea.tags && idea.tags.length > 3 && (
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="secondary" className="text-xs bg-secondary/30">
                   +{idea.tags.length - 3}
                 </Badge>
               )}
@@ -365,105 +367,105 @@ export default function IdeaCard({ idea, onUpdateAction, onDeleteAction, onViewA
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-2 text-xs mb-3">
-            {/* Status Dropdown */}
-            <div>
-              <span className="text-muted-foreground">Status:</span>
-              <div className="mt-1">
-                <Select 
-                  value={idea.status} 
-                  onValueChange={(value) => handleSelectChange('status', value)}
-                >
-                  <SelectTrigger className="h-auto p-0 border-0 shadow-none hover:bg-gray-50">
-                    <SelectValue asChild>
-                      {getStatusBadge(idea.status)}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="new">New</SelectItem>
-                    <SelectItem value="in_progress">In Progress</SelectItem>
-                    <SelectItem value="under_review">In Review</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                  </SelectContent>
-                </Select>
+          {/* Status and Priority Grid */}
+          <div className="grid grid-cols-2 gap-3 text-xs mb-4">
+            {/* Status */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-1 text-muted-foreground">
+                <Target className="h-3 w-3" />
+                <span>Status</span>
               </div>
+              <Select 
+                value={idea.status} 
+                onValueChange={(value) => handleSelectChange('status', value)}
+              >
+                <SelectTrigger className="h-auto p-1 border-0 shadow-none hover:bg-accent/30 transition-colors">
+                  <SelectValue asChild>
+                    {getStatusBadge(idea.status)}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="new">New</SelectItem>
+                  <SelectItem value="in_progress">In Progress</SelectItem>
+                  <SelectItem value="under_review">In Review</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            {/* Priority Dropdown */}
-            <div>
-              <span className="text-muted-foreground">Priority:</span>
-              <div className="mt-1">
-                <Select 
-                  value={idea.priority} 
-                  onValueChange={(value) => handleSelectChange('priority', value)}
-                >
-                  <SelectTrigger className="h-auto p-0 border-0 shadow-none hover:bg-gray-50">
-                    <SelectValue asChild>
-                      {getPriorityBadge(idea.priority)}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="low">Low</SelectItem>
-                  </SelectContent>
-                </Select>
+            {/* Priority */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-1 text-muted-foreground">
+                <Zap className="h-3 w-3" />
+                <span>Priority</span>
               </div>
+              <Select 
+                value={idea.priority} 
+                onValueChange={(value) => handleSelectChange('priority', value)}
+              >
+                <SelectTrigger className="h-auto p-1 border-0 shadow-none hover:bg-accent/30 transition-colors">
+                  <SelectValue asChild>
+                    {getPriorityBadge(idea.priority)}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            {/* Effort Dropdown */}
-            <div>
-              <span className="text-muted-foreground">Effort:</span>
-              <div className="mt-1">
-                <Select 
-                  value={idea.estimated_effort} 
-                  onValueChange={(value) => handleSelectChange('estimated_effort', value)}
-                >
-                  <SelectTrigger className="h-auto p-0 border-0 shadow-none hover:bg-gray-50">
-                    <SelectValue asChild>
-                      <Badge variant="outline" className="text-xs">
-                        {idea.estimated_effort}
-                      </Badge>
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            {/* Effort */}
+            <div className="space-y-2">
+              <span className="text-muted-foreground">Effort</span>
+              <Select 
+                value={idea.estimated_effort} 
+                onValueChange={(value) => handleSelectChange('estimated_effort', value)}
+              >
+                <SelectTrigger className="h-auto p-1 border-0 shadow-none hover:bg-accent/30 transition-colors">
+                  <SelectValue asChild>
+                    <Badge variant="outline" className="text-xs bg-accent/20">
+                      {idea.estimated_effort}
+                    </Badge>
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            {/* Impact Dropdown */}
-            <div>
-              <span className="text-muted-foreground">Impact:</span>
-              <div className="mt-1">
-                <Select 
-                  value={idea.potential_impact} 
-                  onValueChange={(value) => handleSelectChange('potential_impact', value)}
-                >
-                  <SelectTrigger className="h-auto p-0 border-0 shadow-none hover:bg-gray-50">
-                    <SelectValue asChild>
-                      <Badge variant="outline" className="text-xs">
-                        {idea.potential_impact}
-                      </Badge>
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            {/* Impact */}
+            <div className="space-y-2">
+              <span className="text-muted-foreground">Impact</span>
+              <Select 
+                value={idea.potential_impact} 
+                onValueChange={(value) => handleSelectChange('potential_impact', value)}
+              >
+                <SelectTrigger className="h-auto p-1 border-0 shadow-none hover:bg-accent/30 transition-colors">
+                  <SelectValue asChild>
+                    <Badge variant="outline" className="text-xs bg-accent/20">
+                      {idea.potential_impact}
+                    </Badge>
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
-          <div className="pt-2 border-t text-xs text-muted-foreground mt-auto">
+          {/* Footer */}
+          <div className="pt-3 border-t border-border/50 text-xs text-muted-foreground mt-auto">
             <div className="flex items-center gap-2">
               <Clock className="h-3 w-3" />
-              Updated: {new Date(idea.updated_at).toLocaleDateString('es-ES')}
+              <span>Updated: {new Date(idea.updated_at).toLocaleDateString('es-ES')}</span>
             </div>
           </div>
         </div>

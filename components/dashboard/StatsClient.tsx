@@ -15,11 +15,12 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { CartesianGrid, Line, LineChart, XAxis } from 'recharts';
-import { Brain, TrendingUp, TrendingDown, Zap, Lightbulb, PlayCircle, CheckCircle, House } from 'lucide-react';
+import { Brain, TrendingUp, TrendingDown, Zap, Lightbulb, PlayCircle, CheckCircle, House, ArrowRight, Sparkles } from 'lucide-react';
 import { SelectIdea } from '@/lib/db/schema';
 import { useRouter } from 'next/navigation';
 import {  useEffect, useMemo, useState } from 'react';
 import { findSimilarIdeas } from '@/lib/db/queries';
+import { StatsCardSkeleton } from '../skeletons/StastCardSkeleton';
 
 interface DashboardData {
   totalIdeas: number;
@@ -84,10 +85,14 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
         chartData: monthlyCharts.createdByMonth,
         chartConfig: {
           value: {
-            label: "Ideas Created"
+            label: "Ideas Created",
+            color: "hsl(var(--primary))"
           },
         },
-        showChart: true
+        showChart: true,
+        gradient: "from-blue-50 to-blue-100/50",
+        iconBg: "bg-blue-100",
+        iconColor: "text-blue-600"
       },
       {
         title: "In Progress", 
@@ -101,10 +106,14 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
         chartData: monthlyCharts.inProgressByMonth,
         chartConfig: {
           value: {
-            label: "In Progress"
+            label: "In Progress",
+            color: "hsl(var(--chart-2))"
           },
         },
-        showChart: true
+        showChart: true,
+        gradient: "from-orange-50 to-orange-100/50",
+        iconBg: "bg-orange-100",
+        iconColor: "text-orange-600"
       },
       {
         title: "Completed",
@@ -118,10 +127,14 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
         chartData: monthlyCharts.completedByMonth,
         chartConfig: {
           value: {
-            label: "Completed"
+            label: "Completed",
+            color: "hsl(var(--chart-3))"
           },
         },
-        showChart: true
+        showChart: true,
+        gradient: "from-green-50 to-green-100/50",
+        iconBg: "bg-green-100",
+        iconColor: "text-green-600"
       }
     ];
   }, [totalIdeas, inProgress, completed, monthlyCharts]);
@@ -131,10 +144,40 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
   }
 
   const handleCombineIdea = async () => {
-    // Placeholder for combine idea logic
     const result = await findSimilarIdeas("16")
     console.log('Similar ideas found:', result);
     console.log('Combining similar ideas...');
+  };
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      'new': 'bg-blue-100 text-blue-800 border-blue-200',
+      'in_progress': 'bg-orange-100 text-orange-800 border-orange-200',
+      'under_review': 'bg-purple-100 text-purple-800 border-purple-200',
+      'completed': 'bg-green-100 text-green-800 border-green-200'
+    } as const;
+
+    const config = statusConfig[status as keyof typeof statusConfig];
+    return (
+      <Badge variant="outline" className={`text-xs font-medium ${config || 'bg-gray-100 text-gray-800 border-gray-200'}`}>
+        {status.replace('_', ' ')}
+      </Badge>
+    );
+  };
+
+  const getPriorityBadge = (priority: string) => {
+    const priorityConfig = {
+      'high': 'bg-red-100 text-red-800 border-red-200',
+      'medium': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      'low': 'bg-green-100 text-green-800 border-green-200'
+    } as const;
+
+    const config = priorityConfig[priority as keyof typeof priorityConfig];
+    return (
+      <Badge variant="outline" className={`text-xs font-medium ${config || 'bg-gray-100 text-gray-800 border-gray-200'}`}>
+        {priority}
+      </Badge>
+    );
   };
 
   useEffect(() => {
@@ -146,11 +189,13 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
 
   if (!isClient) {
     return (
-      <div className="flex-1 space-y-6 p-6">
+      <div className="h-full space-y-6 p-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-              <House className="h-8 w-8" />
+              <div className="p-3 rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
+                <House className="h-6 w-6" />
+              </div>
               Dashboard
             </h1>
             <p className="text-muted-foreground">
@@ -158,8 +203,10 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
             </p>
           </div>
         </div>
-        <div className="text-center py-12">
-          <div className="animate-pulse">Loading dashboard...</div>
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <StatsCardSkeleton key={i} />
+          ))}
         </div>
       </div>
     );
@@ -171,7 +218,9 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <House className="h-8 w-8" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
+              <House className="h-6 w-6" />
+            </div>
             Dashboard
           </h1>
           <p className="text-muted-foreground">
@@ -193,7 +242,9 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
                   <CardTitle className="text-sm font-medium text-muted-foreground">
                     {stat.title}
                   </CardTitle>
-                  <Icon className="h-4 w-4 text-muted-foreground" />
+                  <div className={`p-2 rounded-lg ${stat.iconBg} group-hover:scale-110 transition-transform duration-200`}>
+                    <Icon className={`h-4 w-4 ${stat.iconColor}`} />
+                  </div>
                 </CardHeader>
                 <CardContent className={stat.showChart ? '' : 'flex-1 flex flex-col justify-center pt-0'}>
                   <div className="text-2xl font-bold">{stat.value}</div>
@@ -263,7 +314,9 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
                   <CardTitle className="text-sm font-medium text-muted-foreground">
                     {stat.title}
                   </CardTitle>
-                  <Icon className="h-4 w-4 text-muted-foreground" />
+                  <div className={`p-2 rounded-lg ${stat.iconBg} group-hover:scale-110 transition-transform duration-200`}>
+                    <Icon className={`h-4 w-4 ${stat.iconColor}`} />
+                  </div>
                 </CardHeader>
                 <CardContent className={stat.showChart ? '' : 'flex-1 flex flex-col justify-center pt-0'}>
                   <div className="text-2xl font-bold">{stat.value}</div>
@@ -328,12 +381,14 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
             const Icon = stat.icon;
             
             return (
-              <Card key={index} className={`relative overflow-hidden ${stat.showChart ? 'h-60' : 'h-fit flex flex-col'}`}>
+              <Card key={index} className={`relative overflow-hidden h-60 border-2 hover:border-primary/20 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-card to-card/50 group`}>
                 <CardHeader className={`flex flex-row items-center justify-between space-y-0 ${stat.showChart ? 'pb-2' : 'pb-0 flex-shrink-0'}`}>
                   <CardTitle className="text-sm font-medium text-muted-foreground">
                     {stat.title}
                   </CardTitle>
-                  <Icon className="h-4 w-4 text-muted-foreground" />
+                  <div className={`p-2 rounded-lg ${stat.iconBg} group-hover:scale-110 transition-transform duration-200`}>
+                    <Icon className={`h-4 w-4 ${stat.iconColor}`} />
+                  </div>
                 </CardHeader>
                 <CardContent className={stat.showChart ? '' : 'flex-1 flex flex-col justify-center pt-0'}>
                   <div className="text-2xl font-bold">{stat.value}</div>
@@ -350,7 +405,7 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
                   {/* Mini line chart - solo si showChart es true */}
                   {stat.showChart && (
                     <div>
-                      <ChartContainer className='h-32 w-full' config={stat.chartConfig}>
+                      <ChartContainer className='h-28 w-full' config={stat.chartConfig}>
                         <LineChart
                           accessibilityLayer
                           data={stat.chartData}
@@ -395,68 +450,57 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
 
       {/* Recent Ideas */}
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+        <Card className="border-2 hover:border-primary/20 transition-all duration-300 bg-gradient-to-br from-card to-card/50">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-purple-100">
+                <Zap className="h-5 w-5 text-purple-600" />
+              </div>
               Recent Ideas
             </CardTitle>
             <CardDescription>Your last 3 created ideas</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {recentIdeas.length > 0 ? (
                 recentIdeas.map((idea) => (
                   <div
                     onClick={gotoIdea(idea.id)}
                     key={idea.id}
-                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                    className="group flex items-center justify-between p-4 border-2 border-transparent rounded-xl hover:bg-accent/50 hover:border-accent/30 transition-all duration-200 cursor-pointer hover:shadow-md max-h-24"
                   >
-                    <div className="space-y-1 flex-1">
-                      <p className="font-medium text-sm line-clamp-1">{idea.title}</p>
+                    <div className="space-y-2 flex-1">
+                      <p className="font-medium text-sm line-clamp-1 group-hover:text-primary transition-colors">
+                        {idea.title}
+                      </p>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="outline" className="text-xs bg-primary/5 text-primary border-primary/20">
                           {idea.category}
                         </Badge>
-                        <Badge
-                          variant={
-                            idea.status === 'new'
-                              ? 'default'
-                              : idea.status === 'in_progress'
-                                ? 'destructive'
-                                : idea.status === 'completed'
-                                  ? 'outline'
-                                  : 'secondary'
-                          }
-                          className="text-xs"
-                        >
-                          {idea.status.replace('_', ' ')}
-                        </Badge>
-                        <Badge
-                          variant={
-                            idea.priority === 'high' ? 'destructive' : 
-                            idea.priority === 'medium' ? 'default' : 'outline'
-                          }
-                          className="text-xs"
-                        >
-                          {idea.priority}
-                        </Badge>
+                        {getStatusBadge(idea.status)}
+                        {getPriorityBadge(idea.priority)}
                       </div>
-                      <p className="text-xs text-muted-foreground" suppressHydrationWarning>
-                        {new Date(idea.created_at).toLocaleDateString('es-ES', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric'
-                        })}
-                      </p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>
+                        <span suppressHydrationWarning>
+                          {new Date(idea.created_at).toLocaleDateString('en-US', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                          })}
+                        </span>
+                      </div>
                     </div>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-200" />
                   </div>
                 ))
               ) : (
-                <div className="text-center py-6 text-muted-foreground">
-                  <Lightbulb className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">You don't have recent ideas</p>
-                  <p className="text-xs">Create your first idea!</p>
+                <div className="text-center py-8 text-muted-foreground">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/20 flex items-center justify-center">
+                    <Lightbulb className="h-8 w-8 opacity-50" />
+                  </div>
+                  <p className="text-sm font-medium mb-1">No recent ideas</p>
+                  <p className="text-xs">Create your first idea to get started!</p>
                 </div>
               )}
             </div>
@@ -465,8 +509,10 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Brain className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-blue-100 to-purple-100">
+                <Sparkles className="h-5 w-5 bg-gradient-to-br from-blue-600 to-purple-600 bg-clip-text" />
+              </div>
               AI Suggestions
             </CardTitle>
             <CardDescription>
@@ -475,11 +521,21 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <Button onClick={handleCombineIdea} variant="ghost" className="flex flex-col w-full p-3 gap-0 items-start h-full bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm font-medium text-blue-900">
-                  💡 Combine similar ideas
-                </p>
-                <p className="text-xs text-blue-700 mt-1">
+              <Button 
+                onClick={handleCombineIdea} 
+                variant="ghost" 
+                className="group flex flex-col w-full p-4 gap-2 items-start h-auto bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200/50 rounded-xl hover:border-blue-300 hover:shadow-md transition-all duration-200"
+              >
+                <div className="flex items-center gap-2 w-full">
+                  <div className="p-1 rounded bg-blue-100">
+                    <Sparkles className="h-3 w-3 text-blue-600" />
+                  </div>
+                  <p className="text-sm font-medium text-blue-900">
+                    Combine similar ideas
+                  </p>
+                  <ArrowRight className="h-3 w-3 text-blue-600 ml-auto group-hover:translate-x-1 transition-transform duration-200" />
+                </div>
+                <p className="text-xs text-blue-700 text-left">
                   You have {totalIdeas} ideas about mobile apps that could be merged
                 </p>
               </Button>

@@ -23,17 +23,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import {
   ArrowLeft,
   Edit3,
   Save,
@@ -49,7 +38,10 @@ import {
   History,
   MessageSquare,
   Target,
-  Zap
+  Zap,
+  Layers,
+  Activity,
+  Sparkles
 } from 'lucide-react';
 import { toggleFavoriteAction, deleteIdeaAction, updateIdeaAction } from '@/lib/actions/ideas';
 import { SelectIdea } from '@/lib/db/schema';
@@ -114,7 +106,6 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
 
       await updateIdeaAction(idea.id, formData);
       
-      // Update local state
       setIdea(prev => ({
         ...prev,
         title: editForm.title,
@@ -137,45 +128,32 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
   };
 
   const getStatusBadge = (status: string) => {
-    const variants = {
-      'nueva': 'default',
-      'en_progreso': 'destructive',
-      'en_revision': 'secondary',
-      'completada': 'outline'
+    const statusConfig = {
+      'new': 'bg-blue-100 text-blue-800 border-blue-200',
+      'in_progress': 'bg-orange-100 text-orange-800 border-orange-200',
+      'under_review': 'bg-purple-100 text-purple-800 border-purple-200',
+      'completed': 'bg-green-100 text-green-800 border-green-200'
     } as const;
 
-    // English translations
-    const statusTranslations: Record<string, string> = {
-      'nueva': 'New',
-      'en_progreso': 'In Progress',
-      'en_revision': 'In Review',
-      'completada': 'Completed'
-    };
-    
+    const config = statusConfig[status as keyof typeof statusConfig];
     return (
-      <Badge variant={variants[status as keyof typeof variants] || 'default'}>
-        {statusTranslations[status] || status.replace('_', ' ')}
+      <Badge variant="outline" className={`text-xs font-medium ${config || 'bg-gray-100 text-gray-800 border-gray-200'}`}>
+        {status.replace('_', ' ')}
       </Badge>
     );
   };
 
   const getPriorityBadge = (priority: string) => {
-    const variants = {
-      'alta': 'destructive',
-      'media': 'secondary',
-      'baja': 'outline'
+    const priorityConfig = {
+      'high': 'bg-red-100 text-red-800 border-red-200',
+      'medium': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      'low': 'bg-green-100 text-green-800 border-green-200'
     } as const;
 
-    // English translations
-    const priorityTranslations: Record<string, string> = {
-      'alta': 'High',
-      'media': 'Medium',
-      'baja': 'Low'
-    };
-    
+    const config = priorityConfig[priority as keyof typeof priorityConfig];
     return (
-      <Badge variant={variants[priority as keyof typeof variants] || 'outline'}>
-        {priorityTranslations[priority] || priority}
+      <Badge variant="outline" className={`text-xs font-medium ${config || 'bg-gray-100 text-gray-800 border-gray-200'}`}>
+        {priority}
       </Badge>
     );
   };
@@ -183,64 +161,72 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
   return (
     <div className="flex-1 max-h-full space-y-6 p-6">
       {/* Header */}
-      <Button variant="ghost" size="sm" onClick={() => router.back()}>
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Back
-      </Button>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2 ">
-              <Lightbulb className="h-8 w-8" />
-              <span className='truncate max-md:max-w-52'>
-                {isEditing ? 'Editing Idea' : idea.title}
-              </span>
+      <div className="flex items-center gap-4 mb-6">
+        <Button variant="ghost" size="sm" onClick={() => router.back()} className="hover:bg-accent/50 transition-colors">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
+      </div>
+
+      <div className="flex items-start justify-between gap-4 mb-6">
+        <div className="flex items-center gap-4 flex-1 min-w-0">
+          <div className="p-3 rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
+            <Lightbulb className="h-6 w-6" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-3xl font-bold tracking-tight truncate">
+              {isEditing ? 'Editing Idea' : idea.title}
             </h1>
-            <p className="text-muted-foreground">
-              {isEditing ? 'Edit your idea details' : 'Full idea details'}
+            <p className="text-muted-foreground mt-1">
+              {isEditing ? 'Edit your idea details' : 'Full idea details and management'}
             </p>
           </div>
         </div>
-        <div className="flex max-md:flex-col gap-2">
+        
+        <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0">
           <Button
             variant="ghost"
             size="sm"
             onClick={handleToggleFavorite}
+            className="hover:bg-yellow-50 transition-colors"
           >
             <Star 
               className={`h-4 w-4 mr-2 ${idea.is_favorite ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'}`} 
             />
-            {idea.is_favorite ? 'Favorite' : 'Mark as favorite'}
+            {idea.is_favorite ? 'Favorite' : 'Add to favorites'}
           </Button>
+          
           {isEditing ? (
             <div className='flex gap-2'>
               <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>
                 <X className="h-4 w-4 mr-2" />
                 Cancel
               </Button>
-              <Button size="sm" onClick={handleSave}>
+              <Button size="sm" onClick={handleSave} className="bg-primary hover:bg-primary/90">
                 <Save className="h-4 w-4 mr-2" />
-                Save
+                Save Changes
               </Button>
             </div>
           ) : (
-            <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+            <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className="hover:bg-primary/5 hover:border-primary/20">
               <Edit3 className="h-4 w-4 mr-2" />
-              Edit
+              Edit Idea
             </Button>
           )}
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="grid gap-6 lg:grid-cols-3 max-h-[70dvh] overflow-y-auto p-3">
+      <div className="grid gap-6 lg:grid-cols-3 max-h-[70dvh] overflow-y-auto p-1">
         {/* Left Column - Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Basic Info */}
-          <Card>
+          <Card className="border-2 hover:border-primary/20 transition-all duration-300 bg-gradient-to-br from-card to-card/50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Lightbulb className="h-5 w-5" />
+                <div className="p-2 rounded-lg bg-blue-100">
+                  <Lightbulb className="h-5 w-5 text-blue-600" />
+                </div>
                 Main Information
               </CardTitle>
             </CardHeader>
@@ -248,27 +234,29 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
               {isEditing ? (
                 <>
                   <div className="space-y-2">
-                    <Label htmlFor="title">Title</Label>
+                    <Label htmlFor="title" className="text-sm font-medium">Title</Label>
                     <Input
                       id="title"
                       value={editForm.title}
                       onChange={(e) => setEditForm(prev => ({ ...prev, title: e.target.value }))}
+                      className="border-2 focus:border-primary/50 transition-colors"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
+                    <Label htmlFor="description" className="text-sm font-medium">Description</Label>
                     <Textarea
                       id="description"
                       rows={6}
                       value={editForm.description}
                       onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
+                      className="border-2 focus:border-primary/50 transition-colors resize-none"
                     />
                   </div>
                 </>
               ) : (
                 <>
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">{idea.title}</h3>
+                    <h3 className="font-semibold text-lg mb-3">{idea.title}</h3>
                     <p className="text-muted-foreground leading-relaxed">{idea.description}</p>
                   </div>
                 </>
@@ -277,29 +265,32 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
           </Card>
 
           {/* Tags */}
-          <Card>
+          <Card className="border-2 hover:border-primary/20 transition-all duration-300 bg-gradient-to-br from-card to-card/50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Tag className="h-5 w-5" />
-                Tags
+                <div className="p-2 rounded-lg bg-purple-100">
+                  <Tag className="h-5 w-5 text-purple-600" />
+                </div>
+                Tags & Keywords
               </CardTitle>
             </CardHeader>
             <CardContent>
               {isEditing ? (
                 <div className="space-y-2">
-                  <Label htmlFor="tags">Tags (comma separated)</Label>
+                  <Label htmlFor="tags" className="text-sm font-medium">Tags (comma separated)</Label>
                   <Input
                     id="tags"
                     value={editForm.tags}
                     onChange={(e) => setEditForm(prev => ({ ...prev, tags: e.target.value }))}
                     placeholder="web, mobile, ai, startup"
+                    className="border-2 focus:border-primary/50 transition-colors"
                   />
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {idea.tags && idea.tags.length > 0 ? (
                     idea.tags.map((tag, index) => (
-                      <Badge key={index} variant="secondary">
+                      <Badge key={index} variant="secondary" className="bg-secondary/30 hover:bg-secondary/50 transition-colors">
                         {tag}
                       </Badge>
                     ))
@@ -311,43 +302,48 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
             </CardContent>
           </Card>
 
-          {/* AI Suggestions */}
-          <Card>
+          {/* AI Suggestions TODO*/}
+          <Card className="border-2 hover:border-primary/20 transition-all duration-300 bg-gradient-to-br from-card to-card/50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Brain className="h-5 w-5" />
-                AI Suggestions
+                <div className="p-2 rounded-lg bg-gradient-to-br from-blue-100 to-purple-100">
+                  <Brain className="h-5 w-5 bg-gradient-to-br from-blue-600 to-purple-600 bg-clip-text text-transparent" />
+                </div>
+                AI Insights
+                <Sparkles className="h-4 w-4 text-yellow-500" />
               </CardTitle>
               <CardDescription>
                 Personalized recommendations for this idea
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm font-medium text-blue-900 flex items-center gap-2">
+              <div className="space-y-4">
+                <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100/50 border-2 border-blue-200/50 rounded-xl">
+                  <p className="text-sm font-medium text-blue-900 flex items-center gap-2 mb-2">
                     <Target className="h-4 w-4" />
                     Improvement opportunities
                   </p>
-                  <p className="text-xs text-blue-700 mt-1">
+                  <p className="text-xs text-blue-700">
                     Consider defining specific metrics to measure the success of this idea
                   </p>
                 </div>
-                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-sm font-medium text-green-900 flex items-center gap-2">
+                
+                <div className="p-4 bg-gradient-to-br from-green-50 to-green-100/50 border-2 border-green-200/50 rounded-xl">
+                  <p className="text-sm font-medium text-green-900 flex items-center gap-2 mb-2">
                     <Zap className="h-4 w-4" />
                     Related ideas
                   </p>
-                  <p className="text-xs text-green-700 mt-1">
+                  <p className="text-xs text-green-700">
                     You have 2 similar ideas that could complement this proposal
                   </p>
                 </div>
-                <div className="p-3 bg-purple-50 border border-purple-200 rounded-lg">
-                  <p className="text-sm font-medium text-purple-900 flex items-center gap-2">
+                
+                <div className="p-4 bg-gradient-to-br from-purple-50 to-purple-100/50 border-2 border-purple-200/50 rounded-xl">
+                  <p className="text-sm font-medium text-purple-900 flex items-center gap-2 mb-2">
                     <MessageSquare className="h-4 w-4" />
                     Next steps
                   </p>
-                  <p className="text-xs text-purple-700 mt-1">
+                  <p className="text-xs text-purple-700">
                     Based on the current status, we suggest creating an initial prototype
                   </p>
                 </div>
@@ -359,17 +355,22 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
         {/* Right Column - Metadata & Actions */}
         <div className="space-y-6">
           {/* Status & Priority */}
-          <Card>
+          <Card className="border-2 hover:border-primary/20 transition-all duration-300 bg-gradient-to-br from-card to-card/50">
             <CardHeader>
-              <CardTitle className="text-base">Status & Priority</CardTitle>
+              <CardTitle className="text-base flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-orange-100">
+                  <Activity className="h-4 w-4 text-orange-600" />
+                </div>
+                Status & Priority
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {isEditing ? (
                 <>
                   <div className="space-y-2">
-                    <Label>Status</Label>
-                    <Select value={editForm.status} onValueChange={(value) => setEditForm(prev => ({ ...prev, status: value.toLowerCase() as typeof prev.status }))}>
-                      <SelectTrigger>
+                    <Label className="text-sm font-medium">Status</Label>
+                    <Select value={editForm.status} onValueChange={(value) => setEditForm(prev => ({ ...prev, status: value as typeof prev.status }))}>
+                      <SelectTrigger className="border-2 focus:border-primary/50">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -381,9 +382,9 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Priority</Label>
+                    <Label className="text-sm font-medium">Priority</Label>
                     <Select value={editForm.priority} onValueChange={(value) => setEditForm(prev => ({ ...prev, priority: value as typeof prev.priority }))}>
-                      <SelectTrigger>
+                      <SelectTrigger className="border-2 focus:border-primary/50">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -398,11 +399,11 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
                 <>
                   <div>
                     <span className="text-sm text-muted-foreground">Status:</span>
-                    <div className="mt-1">{getStatusBadge(idea.status)}</div>
+                    <div className="mt-2">{getStatusBadge(idea.status)}</div>
                   </div>
                   <div>
                     <span className="text-sm text-muted-foreground">Priority:</span>
-                    <div className="mt-1">{getPriorityBadge(idea.priority)}</div>
+                    <div className="mt-2">{getPriorityBadge(idea.priority)}</div>
                   </div>
                 </>
               )}
@@ -410,25 +411,32 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
           </Card>
 
           {/* Categories */}
-          <Card>
+          <Card className="border-2 hover:border-primary/20 transition-all duration-300 bg-gradient-to-br from-card to-card/50">
             <CardHeader>
-              <CardTitle className="text-base">Categorization</CardTitle>
+              <CardTitle className="text-base flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-green-100">
+                  <Layers className="h-4 w-4 text-green-600" />
+                </div>
+                Categorization
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {isEditing ? (
                 <>
                   <div className="space-y-2">
-                    <Label>Category</Label>
+                    <Label className="text-sm font-medium">Category</Label>
                     <Input
                       value={editForm.category}
                       onChange={(e) => setEditForm(prev => ({ ...prev, category: e.target.value }))}
+                      className="border-2 focus:border-primary/50 transition-colors"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Subcategory</Label>
+                    <Label className="text-sm font-medium">Subcategory</Label>
                     <Input
                       value={editForm.subcategory}
                       onChange={(e) => setEditForm(prev => ({ ...prev, subcategory: e.target.value }))}
+                      className="border-2 focus:border-primary/50 transition-colors"
                     />
                   </div>
                 </>
@@ -436,14 +444,14 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
                 <>
                   <div>
                     <span className="text-sm text-muted-foreground">Category:</span>
-                    <div className="mt-1">
-                      <Badge variant="outline">{idea.category}</Badge>
+                    <div className="mt-2">
+                      <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">{idea.category}</Badge>
                     </div>
                   </div>
                   <div>
                     <span className="text-sm text-muted-foreground">Subcategory:</span>
-                    <div className="mt-1">
-                      <Badge variant="outline">{idea.subcategory}</Badge>
+                    <div className="mt-2">
+                      <Badge variant="outline" className="bg-secondary/30">{idea.subcategory}</Badge>
                     </div>
                   </div>
                 </>
@@ -452,20 +460,22 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
           </Card>
 
           {/* Metrics */}
-          <Card>
+          <Card className="border-2 hover:border-primary/20 transition-all duration-300 bg-gradient-to-br from-card to-card/50">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" />
-                Metrics
+                <div className="p-1.5 rounded-lg bg-yellow-100">
+                  <TrendingUp className="h-4 w-4 text-yellow-600" />
+                </div>
+                Impact Metrics
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {isEditing ? (
                 <>
                   <div className="space-y-2">
-                    <Label>Estimated Effort</Label>
+                    <Label className="text-sm font-medium">Estimated Effort</Label>
                     <Select value={editForm.estimated_effort} onValueChange={(value) => setEditForm(prev => ({ ...prev, estimated_effort: value as typeof prev.estimated_effort }))}>
-                      <SelectTrigger>
+                      <SelectTrigger className="border-2 focus:border-primary/50">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -476,9 +486,9 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Potential Impact</Label>
+                    <Label className="text-sm font-medium">Potential Impact</Label>
                     <Select value={editForm.potential_impact} onValueChange={(value) => setEditForm(prev => ({ ...prev, potential_impact: value as typeof prev.potential_impact }))}>
-                      <SelectTrigger>
+                      <SelectTrigger className="border-2 focus:border-primary/50">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -493,14 +503,14 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
                 <>
                   <div>
                     <span className="text-sm text-muted-foreground">Effort:</span>
-                    <div className="mt-1">
-                      <Badge variant="outline">{idea.estimated_effort}</Badge>
+                    <div className="mt-2">
+                      <Badge variant="outline" className="bg-muted/50">{idea.estimated_effort}</Badge>
                     </div>
                   </div>
                   <div>
                     <span className="text-sm text-muted-foreground">Impact:</span>
-                    <div className="mt-1">
-                      <Badge variant="outline">{idea.potential_impact}</Badge>
+                    <div className="mt-2">
+                      <Badge variant="outline" className="bg-accent/20">{idea.potential_impact}</Badge>
                     </div>
                   </div>
                 </>
@@ -509,30 +519,36 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
           </Card>
 
           {/* Timestamps */}
-          <Card>
+          <Card className="border-2 hover:border-primary/20 transition-all duration-300 bg-gradient-to-br from-card to-card/50">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Clock className="h-4 w-4" />
-                Dates
+                <div className="p-1.5 rounded-lg bg-indigo-100">
+                  <Clock className="h-4 w-4 text-indigo-600" />
+                </div>
+                Timeline
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-2 text-sm">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-3 text-sm">
+                <div className="p-2 rounded-lg bg-green-100">
+                  <Calendar className="h-3 w-3 text-green-600" />
+                </div>
                 <div>
-                  <p className="text-muted-foreground">Created:</p>
-                  <p>{new Date(idea.created_at).toLocaleDateString('en-US', {
+                  <p className="text-muted-foreground text-xs">Created:</p>
+                  <p className="font-medium">{new Date(idea.created_at).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
                   })}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 text-sm">
-                <History className="h-4 w-4 text-muted-foreground" />
+              <div className="flex items-center gap-3 text-sm">
+                <div className="p-2 rounded-lg bg-blue-100">
+                  <History className="h-3 w-3 text-blue-600" />
+                </div>
                 <div>
-                  <p className="text-muted-foreground">Updated:</p>
-                  <p>{new Date(idea.updated_at).toLocaleDateString('en-US', {
+                  <p className="text-muted-foreground text-xs">Updated:</p>
+                  <p className="font-medium">{new Date(idea.updated_at).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
@@ -544,14 +560,19 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
 
           {/* Danger Zone */}
           {!isEditing && (
-            <Card className="border-red-200">
+            <Card className="border-2 border-red-200 hover:border-red-300 transition-all duration-300 bg-gradient-to-br from-red-50/50 to-red-100/30">
               <CardHeader>
-                <CardTitle className="text-base text-red-600">Danger Zone</CardTitle>
+                <CardTitle className="text-base text-red-600 flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-red-100">
+                    <Trash className="h-4 w-4 text-red-600" />
+                  </div>
+                  Danger Zone
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <ConfirmModal
                   trigger={
-                    <Button variant="destructive" size="sm" className="w-full">
+                    <Button variant="destructive" size="sm" className="w-full hover:bg-red-600 transition-colors">
                       <Trash className="h-4 w-4 mr-2" />
                       Delete Idea
                     </Button>
