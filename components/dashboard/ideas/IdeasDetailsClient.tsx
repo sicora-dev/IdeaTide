@@ -181,7 +181,7 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
   };
 
   return (
-    <div className="flex-1 space-y-6 p-6">
+    <div className="flex-1 max-h-full space-y-6 p-6">
       {/* Header */}
       <Button variant="ghost" size="sm" onClick={() => router.back()}>
         <ArrowLeft className="h-4 w-4 mr-2" />
@@ -201,7 +201,7 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
             </p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex max-md:flex-col gap-2">
           <Button
             variant="ghost"
             size="sm"
@@ -213,7 +213,7 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
             {idea.is_favorite ? 'Favorite' : 'Mark as favorite'}
           </Button>
           {isEditing ? (
-            <>
+            <div className='flex gap-2'>
               <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>
                 <X className="h-4 w-4 mr-2" />
                 Cancel
@@ -222,7 +222,7 @@ export default function IdeaDetailClient({ idea: initialIdea }: IdeaDetailClient
                 <Save className="h-4 w-4 mr-2" />
                 Save
               </Button>
-            </>
+            </div>
           ) : (
             <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
               <Edit3 className="h-4 w-4 mr-2" />

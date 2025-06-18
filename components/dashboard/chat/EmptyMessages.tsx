@@ -5,7 +5,7 @@ export default function EmptyMessages() {
   return (
     <>
       {/* ChatView equivalent */}
-      <div className="overflow-y-auto grow-1 flex-1">
+      <div className="overflow-y-auto grow-1 flex-1 max-md:hidden">
         <div className="flex flex-col overflow-y-auto h-full rounded-xl bg-base-100 fixed md:relative top-0 z-10 transition-transform duration-300 translate-x-0">
           {/* Central content with Lucide icon */}
           <div className="flex-1 flex flex-col items-center justify-center p-8">

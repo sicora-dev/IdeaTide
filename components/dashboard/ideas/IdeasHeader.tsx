@@ -19,10 +19,6 @@ export function IdeasHeader({ totalIdeas, onCreateIdea }: IdeasHeaderProps) {
         </p>
       </div>
       <div className="flex gap-2 self-end">
-        <Button variant="outline" size="sm">
-          <Brain className="h-4 w-4 mr-2" />
-          AI Auto-organize
-        </Button>
         <Button 
           className='bg-rainbow hover:bg-rainbow-hover'     
           variant="default" 

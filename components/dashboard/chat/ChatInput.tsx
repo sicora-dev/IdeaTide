@@ -4,6 +4,7 @@ import {  useState } from "react";
 import { SendHorizonal } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import toast from "react-hot-toast";
+import { Button } from "@/components/ui/button";
 
 interface ChatInputProps {
   ideaId: number | undefined;
@@ -64,29 +65,25 @@ export default function ChatInput({
   };
 
   return (
-    <div className="px-2 border-2 border-base-200 rounded-box mx-4 mb-4 mt-2">
+    <div className="px-2 border-2 border-base-200 rounded-box mx-4 mb-4 mt-2 flex">
       <div className={`w-full flex items-center p-2`}>
         <Textarea
+        className="resize-none w-full h-16 bg-secondary border-0 focus:ring-0 focus:outline-none"
           value={input}
           onChange={(e) => handleInputChange(e.target.value)}
           placeholder="Type your message..."
           ></Textarea>
       </div>
-      <div className="flex items-center justify-between w-full pb-2">
-        <div className="space-x-2 flex items-center">
-          <div className="h-8 w-[1px] rotate-30 bg-base-200" />
-        </div>
-
-        <div>
-          <div
-            tabIndex={0}
-            role="button"
-            className="btn btn-sm btn-circle z-10 relative group-hover:bg-base-300 group-hover:border-base-300"
-            onClick={handleSend}
-          >
-            <SendHorizonal size={16} />
-          </div>
-        </div>
+      <div className="items-center self-end justify-between w-fit pb-2">
+        <Button
+          variant={"default"}
+          tabIndex={0}
+          role="button"
+          className="p-3 py-0 text-primary btn btn-sm btn-circle z-10 bg-rainbow group-hover:bg-rainbow-hover group-hover:border-base-300"
+          onClick={handleSend}
+        >
+          <SendHorizonal size={16} />
+        </Button>
       </div>
     </div>
   );

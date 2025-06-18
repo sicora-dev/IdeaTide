@@ -178,12 +178,6 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
             Welcome to your idea control center
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button className='bg-rainbow hover:bg-rainbow-hover' variant="default" size="sm">
-            <Brain className="h-4 w-4 mr-2" />
-            Auto-organize
-          </Button>
-        </div>
       </div>
 
       {/* Stats Grid */}
@@ -489,22 +483,6 @@ export default function StatsClient({ dashboardData }: StatsClientProps) {
                   You have {totalIdeas} ideas about mobile apps that could be merged
                 </p>
               </Button>
-              <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-sm font-medium text-green-900">
-                  🚀 Prioritize by impact
-                </p>
-                <p className="text-xs text-green-700 mt-1">
-                  Your high priority ideas need attention
-                </p>
-              </div>
-              <div className="p-3 bg-purple-50 border border-purple-200 rounded-lg">
-                <p className="text-sm font-medium text-purple-900">
-                  📅 Review old ideas
-                </p>
-                <p className="text-xs text-purple-700 mt-1">
-                  Some ideas haven't been updated in a while
-                </p>
-              </div>
             </div>
           </CardContent>
         </Card>

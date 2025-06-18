@@ -22,6 +22,9 @@ export const getAuthenticatedUser = async () => {
   const mappedUser: User = {
     ...fetchedUser,
     email: fetchedUser.email,
+    image: fetchedUser.user_metadata?.avatar_url || null,
+    full_name: fetchedUser.user_metadata?.full_name || null,
+    phone: fetchedUser.user_metadata?.phone || null,
     created_at: fetchedUser.created_at ? new Date(fetchedUser.created_at) : undefined,
     updated_at: fetchedUser.updated_at ? new Date(fetchedUser.updated_at) : undefined,
     last_sign_in_at: fetchedUser.last_sign_in_at ? new Date(fetchedUser.last_sign_in_at) : null,

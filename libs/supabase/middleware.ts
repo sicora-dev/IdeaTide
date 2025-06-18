@@ -34,6 +34,8 @@ export async function updateSession(request: NextRequest) {
         id: fetchedUser.id,
         email: fetchedUser.email,
         full_name: fetchedUser.user_metadata?.full_name || null,
+        image: fetchedUser.user_metadata?.avatar_url || null,
+        phone: fetchedUser.user_metadata?.phone || null
       };
 
       supabaseResponse.cookies.set("sb-user", JSON.stringify(userData), {

@@ -19,7 +19,7 @@ export function IdeaChatItem({
   const [isLoading, setIsLoading] = useState(false);
   
   return (
-    <div>
+    <div className="w-full bg-secondary-foreground/5 rounded-md">
       <div
         className={`p-3 rounded-xl cursor-pointer transition-colors border-transparent hover:bg-input ${
           isSelected ? "sm:border sm:border-accent" : ""

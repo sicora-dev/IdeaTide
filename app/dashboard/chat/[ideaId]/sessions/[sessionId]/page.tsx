@@ -5,7 +5,6 @@ import { Suspense } from "react";
 import ChatLoader from "@/components/dashboard/chat/ChatLoader";
 import ChatViewSkeleton from "@/components/skeletons/ChatViewSkeleton";
 import { getAuthenticatedUser } from "@/libs/supabase/client/auth";
-import { getChatMessagesBySession, getIdeaById, getSessionById } from "@/lib/db/queries";
 
 type Props = {
   params: Promise<{

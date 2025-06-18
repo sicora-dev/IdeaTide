@@ -20,16 +20,15 @@ export default async function DashboardLayout({
   }
   return (
     <Providers>
-      <div className="flex flex-col h-screen w-full bg-muted/40">
+      <div className="flex flex-col h-full overflow-y-hidden w-full bg-muted/40">
         <DesktopNav />
-        <div className="flex-1 flex flex-col h-0 sm:gap-4 sm:py-4 sm:pl-14 overflow-hidden">
-          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 max-md:p-3">
+        <div className="h-full flex flex-col sm:gap-4 sm:py-4 sm:pl-14 ">
+          <header className="flex justify-between items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 max-md:p-3">
             <MobileNav />
             <DashboardBreadcrumb />
-            <SearchInput />
             <User />
           </header>
-          <main className="flex-1 h-0 items-start gap-2 p-4 sm:px-6 sm:py-0 md:gap-4 bg-muted/40 overflow-hidden">
+          <main className="h-full items-start gap-2 p-4 sm:px-6 sm:py-0 md:gap-4 bg-muted/40 max-md:overflow-y-auto">
             {children}
           </main>
         </div>

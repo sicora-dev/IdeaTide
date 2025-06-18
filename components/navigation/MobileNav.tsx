@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { PanelLeft, Home, Lightbulb, LineChart } from "lucide-react";
+import { PanelLeft, Home, Lightbulb, LineChart, MessageCircle } from "lucide-react";
 import { Logo } from "@/components/ui/shared/Logo";
 
 export function MobileNav() {
@@ -48,7 +48,15 @@ export function MobileNav() {
             My Ideas
           </Link>
           <Link
-            href="#"
+            href="/dashboard/chat"
+            onClick={handleClose}
+            className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+          >
+            <MessageCircle className="h-5 w-5" />
+            Ideas Chat
+          </Link>
+          <Link
+            href="/dashboard/settings"
             onClick={handleClose}
             className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
           >

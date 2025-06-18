@@ -25,7 +25,7 @@ export async function User() {
             className="overflow-hidden rounded-full"
           >
             <Image
-              src={user?.image ?? '/placeholder-user.jpg'}
+              src={user?.image ?? user?.full_name.slice(0, 2).toLowerCase() ?? '/placeholder-user.jpg'}
               width={36}
               height={36}
               alt="Avatar"
@@ -38,7 +38,7 @@ export async function User() {
             {user.full_name || 'My Account'}
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <Link href="/dashboard/profile">
+          <Link href="/dashboard/settings">
             <DropdownMenuItem className='cursor-pointer w-full'>Settings</DropdownMenuItem>
           </Link>
           <Link href="/support">

@@ -1,10 +1,7 @@
-// app/dashboard/tickets/[ticketId]/page.tsx
 export const dynamic = "force-dynamic";
 
-import ChatLoader from "@/components/dashboard/chat/ChatLoader";
 import ChatViewSkeleton from "@/components/skeletons/ChatViewSkeleton";
 import { getOrCreateLatestSession } from "@/lib/actions/chat";
-import { getIdeaSessions } from "@/lib/db/queries";
 import { getAuthenticatedUser } from "@/libs/supabase/server/auth";
 import { redirect } from "next/navigation";
 

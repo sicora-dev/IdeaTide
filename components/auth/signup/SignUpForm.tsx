@@ -8,6 +8,7 @@ import { AuthCard } from '../shared/AuthCard';
 import { EmailPasswordForm } from '../shared/EmailPasswordForm';
 import { OAuthSection } from '../shared/OAuthSection';
 import { AuthFooter } from '../shared/AuthFooter';
+import { insertUser } from '@/lib/actions/user';
 export function SignUpForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,16 +34,17 @@ export function SignUpForm() {
 
       if (type === "oauth") {
         if (!provider) throw new Error("OAuth provider is required");
-        const { error } = await supabase.auth.signInWithOAuth({
+        const { data: userData, error } = await supabase.auth.signInWithOAuth({
           provider: provider,
           options: {
             redirectTo: redirectURL,
           },
         });
         if (error) throw error;
+
       } else if (type === "password") {
 
-        const { error } = await supabase.auth.signUp({
+        const { data: userData, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -51,10 +53,21 @@ export function SignUpForm() {
             },
           },
         });
+
         if (error) throw error;
+        if (!userData.user) {
+          throw new Error("User creation failed");
+        }
+
+        await insertUser({
+          id: userData.user?.id,
+          email,
+          full_name: fullName
+        });
         toast.success("Check your email to confirm your account!");
         router.replace("/signin");
       }
+
     } catch (error: any) {
       console.error(error);
       toast.error(error.message || "Error creating account.");

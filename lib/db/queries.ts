@@ -3,7 +3,7 @@
 import { generateEmbedding } from '@/libs/gemini/gemini';
 import { User } from '../types/users';
 import { type SelectIdea, type InsertIdea } from './schema';
-import { createClient } from 'libs/supabase/server/server';
+import { createAdminClient, createClient } from 'libs/supabase/server/server';
 
 // Obtener ideas del usuario
 export async function getIdeas(userId: string, search?: string): Promise<SelectIdea[]> {
@@ -258,6 +258,86 @@ export async function sendMessage(userId: string, sessionId: string, content: st
   }
 }
 
+export async function insertUserData(userData: User) {
+  try {
+    const supabase = await createClient();
+    
+    const { data, error } = await supabase.
+      from('users')
+      .insert([{
+        id: userData.id,
+        email: userData.email,
+        full_name: userData.full_name || null,
+        image: userData.image || null,
+        phone: userData.phone || null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }])
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error inserting user data:', error);
+      return null;
+    }
+    
+    return data;
+  }
+  catch (error) {
+    console.error('Error inserting user data:', error);
+    return null;
+  }
+}
+
+export async function deleteUserData(userId: string) {
+  try {
+    const supabase = await createAdminClient();
+    
+    const { error } = await supabase
+      .from('users')
+      .delete()
+      .eq('id', userId);
+    
+    if (error) {
+      console.error('Error deleting user data:', error);
+      return false;
+    }
+
+    const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+    if (authError) {
+      console.error('Error deleting user from auth:', authError);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error deleting user data:', error);
+    return false;
+  }
+}
+
+export async function getUserData(userId: string) {
+  try {
+    const supabase = await createClient();
+    
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    
+    if (error || !user) {
+      console.error('Error fetching user data:', error);
+      return null;
+    }
+    
+    return user;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    return null;
+  }
+}
+
 export async function updateUserData(userData: Partial<User>) {
   try {
     const supabase = await createClient();
@@ -281,6 +361,98 @@ export async function updateUserData(userData: Partial<User>) {
   }
 }
 
+export async function updateUserProfileData(userId: string, profileData: { nickname: string; biography?: string | null }) {
+  try {
+    const supabase = await createClient();
+    
+    const { data, error } = await supabase
+      .from('users')
+      .update({
+        nickname: profileData.nickname,
+        biography: profileData.biography,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error updating user profile:', error);
+      return null;
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    return null;
+  }
+}
+
+export async function changeUserPassword(currentPassword: string, newPassword: string) {
+  try {
+    const supabase = await createClient();
+    
+    const { data: user } = await supabase.auth.getUser();
+    if (!user.user?.email) {
+      throw new Error('No authenticated user found');
+    }
+
+    // Sign in with current password to verify it
+    const { error: signInError } = await supabase.auth.updateUser({
+      email: user.user.email,
+      password: currentPassword
+    });
+
+    if (signInError) {
+      throw new Error('Current password is incorrect');
+    }
+
+    // Update password
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword
+    });
+    
+    if (error) {
+      console.error('Error changing password:', error);
+      throw error;
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error changing password:', error);
+    throw error;
+  }
+}
+
+export async function getUserAuthMethods(userId: string) {
+  try {
+    const supabase = await createClient();
+    
+    const { data: user, error } = await supabase.auth.getUser();
+    
+    if (error || !user.user) {
+      throw new Error('No authenticated user found');
+    }
+
+    const hasPassword = user.user.app_metadata?.provider === 'email';
+    
+    const identities = user.user.identities || [];
+    const providers = identities.map(identity => identity.provider);
+    
+    return {
+      hasPassword,
+      providers,
+      primaryProvider: user.user.app_metadata?.provider || 'email'
+    };
+  } catch (error) {
+    console.error('Error getting user auth methods:', error);
+    return {
+      hasPassword: false,
+      providers: [],
+      primaryProvider: 'unknown'
+    };
+  }
+}
 export async function getChatMessagesBySession(sessionId: string, userId: string) {
   try {
     const supabase = await createClient();

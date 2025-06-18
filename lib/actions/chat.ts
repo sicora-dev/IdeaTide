@@ -48,3 +48,13 @@ export async function getOrCreateLatestSession(ideaId: number, userId: string) {
   const newSession = await createSession(ideaId, userId);
   return newSession;
 }
+
+export async function createNewSession(ideaId: number, userId: string) {
+  try {
+    const newSession = await createSession(ideaId, userId);
+    return newSession;
+  } catch (error) {
+    console.error("Error creating new session:", error);
+    throw new Error("Failed to create new session");
+  }
+}
