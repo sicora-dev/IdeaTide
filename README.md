@@ -1,5 +1,5 @@
 <div align="center">
-<a href="https:/idea-tide.vercel.app/">Web</a>
+<a href="https://idea-tide.vercel.app/">Web</a>
 </div>
 
 ## Overview
